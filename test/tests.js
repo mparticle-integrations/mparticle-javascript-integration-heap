@@ -147,7 +147,7 @@ describe('XYZ Forwarder', function () {
         // Include any specific settings that is required for initializing your SDK here
         var sdkSettings = {
             clientKey: '123456',
-            appId: 'abcde',
+            appId: '1759220394',
             userIdField: 'customerId'
         };
         // You may require userAttributes or userIdentities to be passed into initialization
@@ -179,7 +179,7 @@ describe('XYZ Forwarder', function () {
         //         category: 'category'
         //     }
         // });
-        
+
         // window.MockXYZForwarder.eventProperties[0].label.should.equal('label');
         // window.MockXYZForwarder.eventProperties[0].value.should.equal(200);
 
