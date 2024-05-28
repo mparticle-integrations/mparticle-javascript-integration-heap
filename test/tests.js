@@ -2,16 +2,16 @@
 describe('XYZ Forwarder', function () {
     // -------------------DO NOT EDIT ANYTHING BELOW THIS LINE-----------------------
     var MessageType = {
-            SessionStart: 1,
-            SessionEnd: 2,
-            PageView: 3,
-            PageEvent: 4,
-            CrashReport: 5,
-            OptOut: 6,
-            AppStateTransition: 10,
-            Profile: 14,
-            Commerce: 16
-        },
+        SessionStart: 1,
+        SessionEnd: 2,
+        PageView: 3,
+        PageEvent: 4,
+        CrashReport: 5,
+        OptOut: 6,
+        AppStateTransition: 10,
+        Profile: 14,
+        Commerce: 16
+    },
         EventType = {
             Unknown: 0,
             Navigation: 1,
@@ -23,7 +23,7 @@ describe('XYZ Forwarder', function () {
             Social: 7,
             Other: 8,
             Media: 9,
-            getName: function() {
+            getName: function () {
                 return 'blahblah';
             }
         },
@@ -70,21 +70,21 @@ describe('XYZ Forwarder', function () {
         },
         reportService = new ReportingService();
 
-// -------------------DO NOT EDIT ANYTHING ABOVE THIS LINE-----------------------
-// -------------------START EDITING BELOW:-----------------------
-// -------------------mParticle stubs - Add any additional stubbing to our methods as needed-----------------------
+    // -------------------DO NOT EDIT ANYTHING ABOVE THIS LINE-----------------------
+    // -------------------START EDITING BELOW:-----------------------
+    // -------------------mParticle stubs - Add any additional stubbing to our methods as needed-----------------------
     mParticle.Identity = {
-        getCurrentUser: function() {
+        getCurrentUser: function () {
             return {
-                getMPID: function() {
+                getMPID: function () {
                     return '123';
                 }
 
             };
         }
     };
-// -------------------START EDITING BELOW:-----------------------
-    var MockXYZForwarder = function() {
+    // -------------------START EDITING BELOW:-----------------------
+    var MockXYZForwarder = function () {
         var self = this;
 
         // create properties for each type of event you want tracked, see below for examples
@@ -104,13 +104,13 @@ describe('XYZ Forwarder', function () {
         this.purchaseEventProperties = [];
 
         // stub your different methods to ensure they are being called properly
-        this.initialize = function(appId, apiKey) {
+        this.initialize = function (appId, apiKey) {
             self.initializeCalled = true;
             self.apiKey = apiKey;
             self.appId = appId;
         };
 
-        this.stubbedTrackingMethod = function(name, eventProperties){
+        this.stubbedTrackingMethod = function (name, eventProperties) {
             self.trackCustomEventCalled = true;
             self.trackCustomName = name;
             self.eventProperties.push(eventProperties);
@@ -118,7 +118,7 @@ describe('XYZ Forwarder', function () {
             return true;
         };
 
-        this.stubbedUserAttributeSettingMethod = function(userAttributes) {
+        this.stubbedUserAttributeSettingMethod = function (userAttributes) {
             self.userId = id;
             userAttributes = userAttributes || {};
             if (Object.keys(userAttributes).length) {
@@ -133,7 +133,7 @@ describe('XYZ Forwarder', function () {
             }
         };
 
-        this.stubbedUserLoginMethod = function(id) {
+        this.stubbedUserLoginMethod = function (id) {
             self.userId = id;
         };
     };
@@ -142,14 +142,14 @@ describe('XYZ Forwarder', function () {
 
     });
 
-    beforeEach(function() {
+    beforeEach(function () {
         window.MockXYZForwarder = new MockXYZForwarder();
         // Include any specific settings that is required for initializing your SDK here
         var sdkSettings = {
             clientKey: '123456',
-            appId: '1759220394',
-            userIdField: 'customerId'
+            appId: '1759220394'
         };
+
         // You may require userAttributes or userIdentities to be passed into initialization
         var userAttributes = {
             color: 'green'
@@ -169,7 +169,17 @@ describe('XYZ Forwarder', function () {
         mParticle.forwarder.init(sdkSettings, reportService.cb, true, null, userAttributes, userIdentities);
     });
 
-    it('should log event', function(done) {
+    it('should initialize Heap', function(done) {
+        mParticle.forwarder.init({
+            appId: '1759220394'
+        });
+
+        window.heap.should.be.defined;
+        window.heap.appid.should.equal('1759220394');
+        done();
+    });
+
+    it('should log event', function (done) {
         // mParticle.forwarder.process({
         //     EventDataType: MessageType.PageEvent,
         //     EventName: 'Test Event',
@@ -186,7 +196,7 @@ describe('XYZ Forwarder', function () {
         done();
     });
 
-    it('should log page view', function(done) {
+    it('should log page view', function (done) {
         // mParticle.forwarder.process({
         //     EventDataType: MessageType.PageView,
         //     EventName: 'test name',
@@ -204,7 +214,7 @@ describe('XYZ Forwarder', function () {
         done();
     });
 
-    it('should log a product purchase commerce event', function(done) {
+    it('should log a product purchase commerce event', function (done) {
         // mParticle.forwarder.process({
         //     EventName: 'Test Purchase Event',
         //     EventDataType: MessageType.Commerce,
@@ -249,7 +259,7 @@ describe('XYZ Forwarder', function () {
         done();
     });
 
-    it('should set customer id user identity on user identity change', function(done) {
+    it('should set customer id user identity on user identity change', function (done) {
         // var fakeUserStub = {
         //     getUserIdentities: function() {
         //         return {

@@ -32,11 +32,11 @@ var initialization = {
             heap.load(forwarderSettings.appId);
 
             if (!window.heap) {
-                var heapScript = document.createElement('script');
-                heapScript.type = 'text/javascript';
-                heapScript.async = true;
-                heapScript.src = 'https://cdn.heapanalytics.com/js/heap-' + forwarderSettings.appId + '.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(heapScript);
+                // var heapScript = document.createElement('script');
+                // heapScript.type = 'text/javascript';
+                // heapScript.async = true;
+                // heapScript.src = 'https://cdn.heapanalytics.com/js/heap-' + forwarderSettings.appId + '.js';
+                // (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(heapScript);
                 heapScript.onload = function () {
                     isInitialized = true;
 
