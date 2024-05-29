@@ -15,28 +15,21 @@ var initialization = {
                Generally, our integrations create script tags and append them to the <head>. Please follow the following format as a guide:
             */
 
-            window.heap = window.heap || []
-            heap.load = function (e, t) {
-                window.heap.appid = e,
-                    window.heap.config = t = t || {}; var
-                        r = document.createElement("script");
-                r.type = "text/javascript",
-                    r.async = !0,
-                    r.src = "https://cdn.heapanalytics.com/js/heap-" + e + ".js";
-                var a = document.getElementsByTagName("script")[0]; a.parentNode.insertBefore(r, a);
-                for (var n = function (e) { return function () { heap.push([e].concat(Array.prototype.slice.call(arguments, 0))) } },
-                    p = ["addEventProperties", "addUserProperties", "clearEventProperties", "identify", "resetIdentity", "removeEventProperty", "setEventProperties", "track", "unsetEventProperty"],
-                    o = 0;
-                    o < p.length; o++)heap[p[o]] = n(p[o])
-            };
-            heap.load(forwarderSettings.appId);
 
             if (!window.heap) {
-                // var heapScript = document.createElement('script');
-                // heapScript.type = 'text/javascript';
-                // heapScript.async = true;
-                // heapScript.src = 'https://cdn.heapanalytics.com/js/heap-' + forwarderSettings.appId + '.js';
-                // (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(heapScript);
+                window.heap = window.heap || []
+                heap.load = function (e, t) {
+                    window.heap.appid = e, window.heap.config = t = t || {};
+                    var r = document.createElement("script");
+                    r.type = "text/javascript", r.async = !0, r.src = "https://cdn.heapanalytics.com/js/heap-" + e + ".js";
+                    var a = document.getElementsByTagName("script")[0]; a.parentNode.insertBefore(r, a);
+                    for (var n = function (e) { return function () { heap.push([e].concat(Array.prototype.slice.call(arguments, 0))) } },
+                        p = ["addEventProperties", "addUserProperties", "clearEventProperties", "identify", "resetIdentity", "removeEventProperty", "setEventProperties", "track", "unsetEventProperty"],
+                        o = 0;
+                        o < p.length; o++)heap[p[o]] = n(p[o])
+                };
+                heap.load(forwarderSettings.appId);
+
                 heapScript.onload = function () {
                     isInitialized = true;
 
