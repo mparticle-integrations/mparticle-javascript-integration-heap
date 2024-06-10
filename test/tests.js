@@ -1,3 +1,5 @@
+const { userIdentificationType } = require("./end-to-end-testapp/settings");
+
 /* eslint-disable no-undef*/
 describe('XYZ Forwarder', function () {
     // -------------------DO NOT EDIT ANYTHING BELOW THIS LINE-----------------------
@@ -168,32 +170,50 @@ describe('XYZ Forwarder', function () {
         // The third argument here is a boolean to indicate that the integration is in test mode to avoid loading any third party scripts. Do not change this value.
         mParticle.forwarder.init(sdkSettings, reportService.cb, true, null, userAttributes, userIdentities);
     });
-
-    it('should initialize Heap', function(done) {
-        mParticle.forwarder.init({
-            appId: '1759220394'
+    describe('initialization', function() {
+        it('should initialize Heap', function(done) {
+            mParticle.forwarder.init({
+                appId: '1759220394'
+            });
+            window.heap.should.be.defined;
+            window.heap.appid.should.equal('1759220394');
+            done();
         });
-
-        window.heap.should.be.defined;
-        window.heap.appid.should.equal('1759220394');
-        done();
     });
 
-    it('should log event', function (done) {
-        // mParticle.forwarder.process({
-        //     EventDataType: MessageType.PageEvent,
-        //     EventName: 'Test Event',
-        //     EventAttributes: {
-        //         label: 'label',
-        //         value: 200,
-        //         category: 'category'
-        //     }
-        // });
+    describe('UserIdentification', function() {
+        it('should log an identity to heap based on the forwarder settings', function(done) {
+            mParticle.forwarder.init({
+                appId: '1759220394',
+                userIdentificationType: "Other"
+            });
 
-        // window.MockXYZForwarder.eventProperties[0].label.should.equal('label');
-        // window.MockXYZForwarder.eventProperties[0].value.should.equal(200);
+            mParticle.forwarder.process()
+        });
+    });
+    describe('EventProcessing', function() {
+        it('should log event', function (done) {
+            mParticle.forwarder.init({
+                appId: '1759220394'
+            });
 
-        done();
+            mParticle.forwarder.process({
+                EventDataType: MessageType.PageEvent,
+                EventName: 'Test Event',
+                EventAttributes: {
+                    label: 'label',
+                    value: 200,
+                    category: 'category'
+                }
+            });
+
+            console.log(window.heap)
+            // window.MockXYZForwarder.eventProperties[0].label.should.equal('label');
+            // window.MockXYZForwarder.eventProperties[0].value.should.equal(200);
+
+            done();
+        });
+
     });
 
     it('should log page view', function (done) {

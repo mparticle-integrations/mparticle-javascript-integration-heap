@@ -95,7 +95,12 @@ A non-ecommerce event has the following schema:
 function EventHandler(common) {
     this.common = common || {};
 }
-EventHandler.prototype.logEvent = function(event) {};
+EventHandler.prototype.logEvent = function(event) {
+    if (event.EventName != "click" && event.EventName != "change" && event.EventName != "submit") {
+        console.log("logEvent", event.EventName, event.EventAttributes);
+        window.heap.track(event.EventName, event.EventAttributes);
+    }
+};
 EventHandler.prototype.logError = function(event) {
     // The schema for a logError event is the same, but noteworthy differences are as follows:
     // {
@@ -136,19 +141,46 @@ For more userIdentity types, see https://docs.mparticle.com/developers/sdk/web/i
 function IdentityHandler(common) {
     this.common = common || {};
 }
-IdentityHandler.prototype.onUserIdentified = function(mParticleUser) {};
+IdentityHandler.prototype.onUserIdentified = function(mParticleUser) {
+    var identities = mParticleUser.getUserIdentities();
+    var identity = identities[this.common.forwarderSettings.userIdentificationType];
+
+    if (identity) {
+        window.heap.identify(identity);
+        console.log('identity handler', identity);
+    }
+};
 IdentityHandler.prototype.onIdentifyComplete = function(
     mParticleUser,
     identityApiRequest
-) {};
+) {
+    var identities = mParticleUser.getUserIdentities();
+    var identity = identities[this.common.forwarderSettings.userIdentificationType];
+
+    if (identity) {
+        window.heap.identify(identity);
+        console.log('identify complete', identity);
+    }
+};
 IdentityHandler.prototype.onLoginComplete = function(
     mParticleUser,
     identityApiRequest
-) {};
+) {
+    var identities = mParticleUser.getUserIdentities();
+    var identity = identities[this.common.forwarderSettings.userIdentificationType];
+
+    if (identity) {
+        window.heap.identify(identity);
+        console.log('login complete', identity);
+    }
+};
 IdentityHandler.prototype.onLogoutComplete = function(
     mParticleUser,
     identityApiRequest
-) {};
+) {
+    window.heap.resetIdentity();
+    console.log("logout complete");
+};
 IdentityHandler.prototype.onModifyComplete = function(
     mParticleUser,
     identityApiRequest
@@ -162,7 +194,11 @@ IdentityHandler.prototype.onSetUserIdentity = function(
     forwarderSettings,
     id,
     type
-) {};
+) {
+    if (forwarderSettings.userIdentificationType == type) {
+        heap.identify(id);
+    }
+};
 
 var identityHandler = IdentityHandler;
 
@@ -178,6 +214,8 @@ var initialization = {
     */
     initForwarder: function (forwarderSettings, testMode, userAttributes, userIdentities, processEvent, eventQueue, isInitialized, common, appVersion, appName, customFlags, clientId) {
         /* `forwarderSettings` contains your SDK specific settings such as apiKey that your customer needs in order to initialize your SDK properly */
+        common.settings = forwarderSettings;
+
         if (!testMode) {
             /* Load your Web SDK here using a variant of your snippet from your readme that your customers would generally put into their <head> tags
                Generally, our integrations create script tags and append them to the <head>. Please follow the following format as a guide:

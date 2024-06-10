@@ -21,19 +21,46 @@ For more userIdentity types, see https://docs.mparticle.com/developers/sdk/web/i
 function IdentityHandler(common) {
     this.common = common || {};
 }
-IdentityHandler.prototype.onUserIdentified = function(mParticleUser) {};
+IdentityHandler.prototype.onUserIdentified = function(mParticleUser) {
+    var identities = mParticleUser.getUserIdentities();
+    var identity = identities[this.common.forwarderSettings.userIdentificationType];
+
+    if (identity) {
+        window.heap.identify(identity);
+        console.log('identity handler', identity);
+    }
+};
 IdentityHandler.prototype.onIdentifyComplete = function(
     mParticleUser,
     identityApiRequest
-) {};
+) {
+    var identities = mParticleUser.getUserIdentities();
+    var identity = identities[this.common.forwarderSettings.userIdentificationType];
+
+    if (identity) {
+        window.heap.identify(identity);
+        console.log('identify complete', identity);
+    }
+};
 IdentityHandler.prototype.onLoginComplete = function(
     mParticleUser,
     identityApiRequest
-) {};
+) {
+    var identities = mParticleUser.getUserIdentities();
+    var identity = identities[this.common.forwarderSettings.userIdentificationType];
+
+    if (identity) {
+        window.heap.identify(identity);
+        console.log('login complete', identity);
+    }
+};
 IdentityHandler.prototype.onLogoutComplete = function(
     mParticleUser,
     identityApiRequest
-) {};
+) {
+    window.heap.resetIdentity();
+    console.log("logout complete");
+};
 IdentityHandler.prototype.onModifyComplete = function(
     mParticleUser,
     identityApiRequest
@@ -47,6 +74,10 @@ IdentityHandler.prototype.onSetUserIdentity = function(
     forwarderSettings,
     id,
     type
-) {};
+) {
+    if (forwarderSettings.userIdentificationType == type) {
+        heap.identify(id);
+    }
+};
 
 module.exports = IdentityHandler;
