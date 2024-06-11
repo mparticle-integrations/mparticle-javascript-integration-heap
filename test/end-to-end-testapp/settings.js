@@ -5,7 +5,7 @@ var SDKsettings = {
     into the src/initialization.js file as the
     */
    appId: '1759220394',
-   userIdentificationType: 'Other'
+   userIdentificationType: 'customerid'
 };
 
 // Do not edit below:

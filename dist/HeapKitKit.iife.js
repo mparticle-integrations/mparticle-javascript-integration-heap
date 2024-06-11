@@ -1,4 +1,4 @@
-var HeapKit = (function (exports) {
+var HeapKitKit = (function (exports) {
     'use strict';
 
     function Common() {}
@@ -96,7 +96,6 @@ var HeapKit = (function (exports) {
     }
     EventHandler.prototype.logEvent = function(event) {
         if (event.EventName != "click" && event.EventName != "change" && event.EventName != "submit") {
-            console.log("logEvent", event.EventName, event.EventAttributes);
             window.heap.track(event.EventName, event.EventAttributes);
         }
     };
@@ -141,10 +140,9 @@ var HeapKit = (function (exports) {
         this.common = common || {};
     }
     IdentityHandler.prototype.onUserIdentified = function(mParticleUser) {
-        var identities = mParticleUser.getUserIdentities();
-        var identity = identities[this.common.forwarderSettings.userIdentificationType];
+        var identitiesReturn = mParticleUser.getUserIdentities();
+        var identity = identitiesReturn.userIdentities[this.common.userIdentificationType];
 
-        console.log('identity handler', identity);
         if (identity) {
             window.heap.identify(identity);
         }
@@ -153,32 +151,17 @@ var HeapKit = (function (exports) {
         mParticleUser,
         identityApiRequest
     ) {
-        var identities = mParticleUser.getUserIdentities();
-        var identity = identities[this.common.forwarderSettings.userIdentificationType];
-
-        console.log('identify complete', identity);
-        if (identity) {
-            window.heap.identify(identity);
-        }
     };
     IdentityHandler.prototype.onLoginComplete = function(
         mParticleUser,
         identityApiRequest
     ) {
-        var identities = mParticleUser.getUserIdentities();
-        var identity = identities[this.common.forwarderSettings.userIdentificationType];
-
-        console.log('login complete', identity);
-        if (identity) {
-            window.heap.identify(identity);
-        }
     };
     IdentityHandler.prototype.onLogoutComplete = function(
         mParticleUser,
         identityApiRequest
     ) {
         window.heap.resetIdentity();
-        console.log("logout complete");
     };
     IdentityHandler.prototype.onModifyComplete = function(
         mParticleUser,
@@ -202,7 +185,8 @@ var HeapKit = (function (exports) {
     var identityHandler = IdentityHandler;
 
     var initialization = {
-        name: 'Heap',
+        name: 'HeapKit',
+        moduleId: 31,
         /*  ****** Fill out initForwarder to load your SDK ******
             Note that not all arguments may apply to your SDK initialization.
             These are passed from mParticle, but leave them even if they are not being used.
@@ -213,7 +197,7 @@ var HeapKit = (function (exports) {
         */
         initForwarder: function (forwarderSettings, testMode, userAttributes, userIdentities, processEvent, eventQueue, isInitialized, common, appVersion, appName, customFlags, clientId) {
             /* `forwarderSettings` contains your SDK specific settings such as apiKey that your customer needs in order to initialize your SDK properly */
-            common.settings = forwarderSettings;
+            common.userIdentificationType= forwarderSettings.userIdentificationType;
 
             if (!testMode) {
                 /* Load your Web SDK here using a variant of your snippet from your readme that your customers would generally put into their <head> tags
@@ -225,28 +209,27 @@ var HeapKit = (function (exports) {
                     window.heap = window.heap || [];
                     heap.load = function (e, t) {
                         window.heap.appid = e, window.heap.config = t = t || {};
-                        var r = document.createElement("script");
-                        r.type = "text/javascript", r.async = !0, r.src = "https://cdn.heapanalytics.com/js/heap-" + e + ".js";
-                        var a = document.getElementsByTagName("script")[0]; a.parentNode.insertBefore(r, a);
-                        for (var n = function (e) { return function () { heap.push([e].concat(Array.prototype.slice.call(arguments, 0))); } },
-                            p = ["addEventProperties", "addUserProperties", "clearEventProperties", "identify", "resetIdentity", "removeEventProperty", "setEventProperties", "track", "unsetEventProperty"],
-                            o = 0;
-                            o < p.length; o++)heap[p[o]] = n(p[o]);
-                    };
-                    heap.load(forwarderSettings.appId);
+                        var heapScript = document.createElement("script");
+                        heapScript.type = "text/javascript";
+                        heapScript.async = !0;
+                        heapScript.src = "https://cdn.heapanalytics.com/js/heap-" + e + ".js";
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(heapScript);
 
-                    heapScript.onload = function () {
+                        heapScript.onload = function () {
 
-                        if (window.heap && eventQueue.length > 0) {
-                            // Process any events that may have been queued up while forwarder was being initialized.
-                            for (var i = 0; i < eventQueue.length; i++) {
-                                processEvent(eventQueue[i]);
+                            if (window.heap && eventQueue.length > 0) {
+                                // Process any events that may have been queued up while forwarder was being initialized.
+                                for (var i = 0; i < eventQueue.length; i++) {
+                                    processEvent(eventQueue[i]);
+                                }
+                                // now that each queued event is processed, we empty the eventQueue
+                                eventQueue = [];
                             }
-                            // now that each queued event is processed, we empty the eventQueue
-                            eventQueue = [];
-                        }
 
+                        };
                     };
+                    console.log('initialization', forwarderSettings.appid);
+                    window.heap.load(forwarderSettings.appId);
                 }
 
 

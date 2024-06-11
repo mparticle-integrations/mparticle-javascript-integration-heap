@@ -1,4 +1,4 @@
-module.exports = function(config) {
+module.exports = function (config) {
     config.set({
         frameworks: ['mocha', 'chai'],
         files: ['../test-bundle.js'],
@@ -6,13 +6,17 @@ module.exports = function(config) {
         port: 9876,
         colors: true,
         logLevel: config.LOG_INFO,
-        browsers: ['ChromeHeadless', 'Chrome', 'FirefoxHeadless', 'Safari', 'Edge', 'IE', 'Firefox'],
+        browsers: ['ChromeHeadless', 'Chrome', 'FirefoxHeadless', 'Safari', 'Edge', 'IE', 'Firefox', 'ChromeDebugging'],
         autoWatch: false,
         concurrency: Infinity,
         customLaunchers: {
             FirefoxHeadless: {
                 base: 'Firefox',
-                flags: [ '-headless' ]
+                flags: ['-headless']
+            },
+            ChromeDebugging: {
+                base: 'Chrome',
+                flags: ['--remote-debugging-port=9333']
             }
         }
     });

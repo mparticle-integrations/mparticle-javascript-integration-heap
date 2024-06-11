@@ -1,7 +1,7 @@
 const { userIdentificationType } = require("./end-to-end-testapp/settings");
 
 /* eslint-disable no-undef*/
-describe('XYZ Forwarder', function () {
+describe('Heap Forwarder', function () {
     // -------------------DO NOT EDIT ANYTHING BELOW THIS LINE-----------------------
     var MessageType = {
         SessionStart: 1,
@@ -86,19 +86,20 @@ describe('XYZ Forwarder', function () {
         }
     };
     // -------------------START EDITING BELOW:-----------------------
-    var MockXYZForwarder = function () {
+    var MockHeapForwarder = function () {
         var self = this;
 
         // create properties for each type of event you want tracked, see below for examples
         this.trackCustomEventCalled = false;
         this.logPurchaseEventCalled = false;
+        this.loadCalled = false;
+        this.identifyCalled = false;
         this.initializeCalled = false;
 
         this.trackCustomName = null;
         this.logPurchaseName = null;
-        this.apiKey = null;
-        this.appId = null;
-        this.userId = null;
+        this.appid = null;
+        this.identity = null;
         this.userAttributes = {};
         this.userIdField = null;
 
@@ -106,11 +107,19 @@ describe('XYZ Forwarder', function () {
         this.purchaseEventProperties = [];
 
         // stub your different methods to ensure they are being called properly
-        this.initialize = function (appId, apiKey) {
+        this.initialize = function(appId) {
             self.initializeCalled = true;
-            self.apiKey = apiKey;
-            self.appId = appId;
+            self.appid = appId;
+        }
+        this.load = function (appId) {
+            self.loadCalled = true;
+            self.appid = appId;
         };
+
+        this.identify = function (identity) {
+            self.identity = identity;
+            self.identifyCalled = true;
+        }
 
         this.stubbedTrackingMethod = function (name, eventProperties) {
             self.trackCustomEventCalled = true;
@@ -145,11 +154,11 @@ describe('XYZ Forwarder', function () {
     });
 
     beforeEach(function () {
-        window.MockXYZForwarder = new MockXYZForwarder();
+        window.MockHeapForwarder = new MockHeapForwarder();
         // Include any specific settings that is required for initializing your SDK here
         var sdkSettings = {
-            clientKey: '123456',
-            appId: '1759220394'
+            appId: '17592203',
+            userIdentificationType: 'customerid'
         };
 
         // You may require userAttributes or userIdentities to be passed into initialization
@@ -170,28 +179,72 @@ describe('XYZ Forwarder', function () {
         // The third argument here is a boolean to indicate that the integration is in test mode to avoid loading any third party scripts. Do not change this value.
         mParticle.forwarder.init(sdkSettings, reportService.cb, true, null, userAttributes, userIdentities);
     });
-    describe('initialization', function() {
-        it('should initialize Heap', function(done) {
+
+    describe('initialization', function () {
+        it('should initialize Heap', function (done) {
             mParticle.forwarder.init({
-                appId: '1759220394'
+                appId: '17592203'
             });
+
             window.heap.should.be.defined;
-            window.heap.appid.should.equal('1759220394');
+            window.heap.appid.should.equal('17592203');
             done();
         });
     });
 
-    describe('UserIdentification', function() {
-        it('should log an identity to heap based on the forwarder settings', function(done) {
+    describe('UserIdentification', function () {
+        it('should log the correct identity to heap based on the forwarder settings', function (done) {
+            window.heap = new MockHeapForwarder();
+
             mParticle.forwarder.init({
                 appId: '1759220394',
-                userIdentificationType: "Other"
+                userIdentificationType: 'customerid'
             });
 
-            mParticle.forwarder.process()
+            var user = {
+                getUserIdentities: function () {
+                    return {
+                        userIdentities: {
+                            customerid: 'cid123'
+                        }
+                    }
+                }
+            }
+            mParticle.forwarder.onUserIdentified(user);
+
+            window.heap.should.be.defined;
+            window.heap.identity.should.equal('cid123');
+            done();
+        });
+
+        it('should return a null identity on logout', function (done) {
+            mParticle.forwarder.init({
+                appId: '1759220394',
+                userIdentificationType: 'customerid'
+            });
+
+            var user = {
+                getUserIdentities: function () {
+                    return {
+                        userIdentities: {
+                            customerid: 'cid123'
+                        }
+                    }
+                }
+            }
+            mParticle.forwarder.onUserIdentified(user);
+
+            window.heap.should.be.defined;
+            window.heap.identity.should.equal('cid123');
+
+            mParticle.forwarder.onLogoutComplete();
+
+            window.heap.identity.should.not.exist;
+            done();
         });
     });
-    describe('EventProcessing', function() {
+
+    describe('EventProcessing', function () {
         it('should log event', function (done) {
             mParticle.forwarder.init({
                 appId: '1759220394'
@@ -207,7 +260,7 @@ describe('XYZ Forwarder', function () {
                 }
             });
 
-            console.log(window.heap)
+
             // window.MockXYZForwarder.eventProperties[0].label.should.equal('label');
             // window.MockXYZForwarder.eventProperties[0].value.should.equal(200);
 

@@ -22,44 +22,28 @@ function IdentityHandler(common) {
     this.common = common || {};
 }
 IdentityHandler.prototype.onUserIdentified = function(mParticleUser) {
-    var identities = mParticleUser.getUserIdentities();
-    var identity = identities[this.common.forwarderSettings.userIdentificationType];
+    var identitiesReturn = mParticleUser.getUserIdentities();
+    var identity = identitiesReturn.userIdentities[this.common.userIdentificationType];
 
     if (identity) {
         window.heap.identify(identity);
-        console.log('identity handler', identity);
     }
 };
 IdentityHandler.prototype.onIdentifyComplete = function(
     mParticleUser,
     identityApiRequest
 ) {
-    var identities = mParticleUser.getUserIdentities();
-    var identity = identities[this.common.forwarderSettings.userIdentificationType];
-
-    if (identity) {
-        window.heap.identify(identity);
-        console.log('identify complete', identity);
-    }
 };
 IdentityHandler.prototype.onLoginComplete = function(
     mParticleUser,
     identityApiRequest
 ) {
-    var identities = mParticleUser.getUserIdentities();
-    var identity = identities[this.common.forwarderSettings.userIdentificationType];
-
-    if (identity) {
-        window.heap.identify(identity);
-        console.log('login complete', identity);
-    }
 };
 IdentityHandler.prototype.onLogoutComplete = function(
     mParticleUser,
     identityApiRequest
 ) {
     window.heap.resetIdentity();
-    console.log("logout complete");
 };
 IdentityHandler.prototype.onModifyComplete = function(
     mParticleUser,

@@ -18,7 +18,6 @@ function EventHandler(common) {
 }
 EventHandler.prototype.logEvent = function(event) {
     if (event.EventName != "click" && event.EventName != "change" && event.EventName != "submit") {
-        console.log("logEvent", event.EventName, event.EventAttributes);
         window.heap.track(event.EventName, event.EventAttributes);
     }
 };
