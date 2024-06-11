@@ -228,7 +228,8 @@ var HeapKitKit = (function (exports) {
 
                         };
                     };
-                    heap.load(forwarderSettings.appId);
+
+                    window.heap.load(forwarderSettings.appId);
                 }
 
 
@@ -265,12 +266,23 @@ var HeapKitKit = (function (exports) {
     UserAttributeHandler.prototype.onRemoveUserAttribute = function(
         key,
         mParticleUser
-    ) {};
+    ) {
+        delete this.common.userAttributes[key];
+        window.heap.addUserProperties(this.common.userAttributes);
+    };
     UserAttributeHandler.prototype.onSetUserAttribute = function(
         key,
         value,
         mParticleUser
-    ) {};
+    ) {
+        if (!this.common.userAttributes) {
+            this.common.userAttributes = {};
+        }
+
+        this.common.userAttributes[key] = value;
+        console.log(this.common.userAttributes);
+        window.heap.addUserProperties(this.common.userAttributes);
+    };
     UserAttributeHandler.prototype.onConsentStateUpdated = function(
         oldState,
         newState,

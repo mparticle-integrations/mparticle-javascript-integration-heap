@@ -92,6 +92,7 @@ describe('Heap Forwarder', function () {
         // create properties for each type of event you want tracked, see below for examples
         this.trackCustomEventCalled = false;
         this.logPurchaseEventCalled = false;
+        this.addUserPropertiesCalled = false;
         this.loadCalled = false;
         this.identifyCalled = false;
         this.initializeCalled = false;
@@ -119,6 +120,11 @@ describe('Heap Forwarder', function () {
         this.identify = function (identity) {
             self.identity = identity;
             self.identifyCalled = true;
+        };
+
+        this.addUserProperties = function(properties) {
+            self.addUserPropertiesCalled = true;
+            self.userAttributes = properties;
         }
 
         this.stubbedTrackingMethod = function (name, eventProperties) {
@@ -240,6 +246,28 @@ describe('Heap Forwarder', function () {
             mParticle.forwarder.onLogoutComplete();
 
             window.heap.identity.should.not.exist;
+            done();
+        });
+    });
+
+    describe('UserAttributeProcessing', function () {
+        it('Should log all user attributes when one is added', function (done) {
+            mParticle.forwarder.setUserAttribute("newKey", "newValue");
+
+            window.heap.addUserPropertiesCalled.should.equal(true);
+            done();
+        });
+
+        it('Should log user attributes when one is removed', function(done){
+            mParticle.forwarder.setUserAttribute("newKey2", "newValue2");
+
+            window.heap.userAttributes.newKey2.should.exist;
+            window.heap.userAttributes.newKey.should.exist;
+
+            mParticle.forwarder.removeUserAttribute("newKey");
+
+            Object.keys(window.heap.userAttributes).length.should.equal(1);
+            window.heap.addUserPropertiesCalled.should.equal(true);
             done();
         });
     });
