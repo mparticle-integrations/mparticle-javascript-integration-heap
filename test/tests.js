@@ -84,11 +84,11 @@ describe('XYZ Forwarder', function () {
         }
     };
     // -------------------START EDITING BELOW:-----------------------
-    var MockXYZForwarder = function () {
+    var MockHeapForwarder = function () {
         var self = this;
 
         // create properties for each type of event you want tracked, see below for examples
-        this.trackCustomEventCalled = false;
+        this.trackCalled = false;
         this.logPurchaseEventCalled = false;
         this.initializeCalled = false;
 
@@ -100,6 +100,7 @@ describe('XYZ Forwarder', function () {
         this.userAttributes = {};
         this.userIdField = null;
 
+        this.events = [];
         this.eventProperties = [];
         this.purchaseEventProperties = [];
 
@@ -109,6 +110,12 @@ describe('XYZ Forwarder', function () {
             self.apiKey = apiKey;
             self.appId = appId;
         };
+
+        this.track = function (eventName, eventAttributes) {
+            this.trackCalled = true;
+            this.events.push(eventName);
+            this.eventProperties.push(eventAttributes);
+        }
 
         this.stubbedTrackingMethod = function (name, eventProperties) {
             self.trackCustomEventCalled = true;
@@ -143,7 +150,7 @@ describe('XYZ Forwarder', function () {
     });
 
     beforeEach(function () {
-        window.MockXYZForwarder = new MockXYZForwarder();
+        window.MockHeapForwarder = new MockHeapForwarder();
         // Include any specific settings that is required for initializing your SDK here
         var sdkSettings = {
             clientKey: '123456',
@@ -180,19 +187,27 @@ describe('XYZ Forwarder', function () {
     });
 
     it('should log event', function (done) {
-        // mParticle.forwarder.process({
-        //     EventDataType: MessageType.PageEvent,
-        //     EventName: 'Test Event',
-        //     EventAttributes: {
-        //         label: 'label',
-        //         value: 200,
-        //         category: 'category'
-        //     }
-        // });
+        window.heap = new MockHeapForwarder();
+        mParticle.forwarder.init({
+            appId: '1759220394'
+        });
 
-        // window.MockXYZForwarder.eventProperties[0].label.should.equal('label');
-        // window.MockXYZForwarder.eventProperties[0].value.should.equal(200);
+        mParticle.forwarder.process({
+            EventDataType: MessageType.PageEvent,
+            EventName: 'Test Event',
+            EventAttributes: {
+                label: 'label',
+                value: 200,
+                category: 'category'
+            }
+        });
 
+        window.heap.trackCalled.should.equal(true);
+        window.heap.events.length.should.equal(1);
+        window.heap.events[0].should.equal('Test Event');
+        window.heap.eventProperties[0].label.should.equal('label');
+        window.heap.eventProperties[0].value.should.equal(200);
+        window.heap.eventProperties[0].category.should.equal('category');
         done();
     });
 
