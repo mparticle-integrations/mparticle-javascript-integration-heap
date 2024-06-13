@@ -1,4 +1,4 @@
 node_modules/
 test/test-bundle.js
 .DS_Store
-.npmrc
+dist/
