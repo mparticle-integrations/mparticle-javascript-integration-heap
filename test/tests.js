@@ -147,7 +147,7 @@ describe('XYZ Forwarder', function () {
         // Include any specific settings that is required for initializing your SDK here
         var sdkSettings = {
             clientKey: '123456',
-            appId: '1759220394'
+            appId: 'test-app-id'
         };
 
         // You may require userAttributes or userIdentities to be passed into initialization
@@ -171,11 +171,11 @@ describe('XYZ Forwarder', function () {
 
     it('should initialize Heap', function(done) {
         mParticle.forwarder.init({
-            appId: 'test-api-key'
+            appId: 'test-app-id'
         });
 
         window.heap.should.be.defined;
-        window.heap.appid.should.equal('test-api-key');
+        window.heap.appid.should.equal('test-app-id');
         done();
     });
 
