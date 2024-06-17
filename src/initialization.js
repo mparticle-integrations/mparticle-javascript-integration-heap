@@ -16,7 +16,7 @@ var initialization = {
             */
 
 
-               if (!window.heap) {
+            if (!window.heap) {
                 window.heap = window.heap || []
                 heap.load = function (e, t) {
                     window.heap.appid = e, window.heap.config = t = t || {};

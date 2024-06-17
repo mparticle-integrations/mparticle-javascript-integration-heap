@@ -169,7 +169,7 @@ describe('XYZ Forwarder', function () {
         mParticle.forwarder.init(sdkSettings, reportService.cb, true, null, userAttributes, userIdentities);
     });
 
-    it('should initialize Heap', function(done) {
+    it('should initialize Heap', function (done) {
         mParticle.forwarder.init({
             appId: 'test-app-id'
         });
