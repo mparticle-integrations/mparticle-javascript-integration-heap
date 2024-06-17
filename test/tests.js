@@ -171,11 +171,11 @@ describe('XYZ Forwarder', function () {
 
     it('should initialize Heap', function(done) {
         mParticle.forwarder.init({
-            appId: '1759220394'
+            appId: 'test-api-key'
         });
 
         window.heap.should.be.defined;
-        window.heap.appid.should.equal('1759220394');
+        window.heap.appid.should.equal('test-api-key');
         done();
     });
 
