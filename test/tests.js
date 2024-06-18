@@ -105,10 +105,12 @@ describe('Heap Forwarder', function () {
         this.purchaseEventProperties = [];
 
         // stub your different methods to ensure they are being called properly
-        this.initialize = function(appId) {
+        this.initialize = function (appId, apiKey) {
             self.initializeCalled = true;
-            self.appid = appId;
-        }
+            self.apiKey = apiKey;
+            self.appId = appId;
+        };
+
         this.load = function (appId) {
             self.loadCalled = true;
             self.appid = appId;
@@ -201,18 +203,6 @@ describe('Heap Forwarder', function () {
         window.heap.should.be.defined;
         window.heap.appid.should.equal('test-app-id');
         done();
-    });
-
-    describe('initialization', function () {
-        it('should initialize Heap', function (done) {
-            mParticle.forwarder.init({
-                appId: '17592203'
-            });
-
-            window.heap.should.be.defined;
-            window.heap.appid.should.equal('17592203');
-            done();
-        });
     });
 
     describe('UserIdentification', function () {
