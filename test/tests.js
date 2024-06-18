@@ -125,7 +125,6 @@ describe('XYZ Forwarder', function () {
         };
 
         this.stubbedUserAttributeSettingMethod = function (userAttributes) {
-        this.stubbedUserAttributeSettingMethod = function (userAttributes) {
             self.userId = id;
             userAttributes = userAttributes || {};
             if (Object.keys(userAttributes).length) {
@@ -197,18 +196,18 @@ describe('XYZ Forwarder', function () {
 
     it('should initialize Heap', function(done) {
         mParticle.forwarder.init({
-            appId: '1759220394'
+            appId: 'test-app-id'
         });
 
         window.heap.should.be.defined;
-        window.heap.appid.should.equal('1759220394');
+        window.heap.appid.should.equal('test-app-id');
         done();
     });
 
     it('should log event', function (done) {
         window.heap = new MockHeapForwarder();
         mParticle.forwarder.init({
-            appId: '1759220394'
+            appId: 'test-app-id'
         });
 
         mParticle.forwarder.process({
@@ -319,5 +318,4 @@ describe('XYZ Forwarder', function () {
 
         done();
     });
-}
 });
