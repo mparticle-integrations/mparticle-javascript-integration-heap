@@ -155,8 +155,6 @@ describe('Heap Forwarder', function () {
 
     before(function () {});
 
-    });
-
     beforeEach(function () {
         window.MockHeapForwarder = new MockHeapForwarder();
         // Include any specific settings that is required for initializing your SDK here
@@ -210,7 +208,7 @@ describe('Heap Forwarder', function () {
             window.heap = new MockHeapForwarder();
 
             mParticle.forwarder.init({
-                appId: '1759220394',
+                appId: 'test-app-id',
                 userIdentificationType: 'customerid'
             });
 
@@ -232,7 +230,7 @@ describe('Heap Forwarder', function () {
 
         it('should return a null identity on logout', function (done) {
             mParticle.forwarder.init({
-                appId: '1759220394',
+                appId: 'test-app-id',
                 userIdentificationType: 'customerid'
             });
 
@@ -282,7 +280,7 @@ describe('Heap Forwarder', function () {
     describe('EventProcessing', function () {
         it('should log event', function (done) {
             mParticle.forwarder.init({
-                appId: '1759220394'
+                appId: 'test-app-id'
             });
 
             mParticle.forwarder.process({
@@ -322,7 +320,6 @@ describe('Heap Forwarder', function () {
         done();
     });
 
-    it('should log a product purchase commerce event', function (done) {
     it('should log a product purchase commerce event', function (done) {
         // mParticle.forwarder.process({
         //     EventName: 'Test Purchase Event',

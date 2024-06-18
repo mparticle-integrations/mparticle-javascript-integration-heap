@@ -22,8 +22,8 @@ function IdentityHandler(common) {
     this.common = common || {};
 }
 IdentityHandler.prototype.onUserIdentified = function(mParticleUser) {
-    var identitiesReturn = mParticleUser.getUserIdentities();
-    var identity = identitiesReturn.userIdentities[this.common.userIdentificationType];
+    var identitiesObject = mParticleUser.getUserIdentities();
+    var identity = identitiesObject.userIdentities[this.common.userIdentificationType];
 
     if (identity) {
         window.heap.identify(identity);
