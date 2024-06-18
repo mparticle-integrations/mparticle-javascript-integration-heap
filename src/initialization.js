@@ -27,8 +27,9 @@ var initialization = {
             /* Load your Web SDK here using a variant of your snippet from your readme that your customers would generally put into their <head> tags
                Generally, our integrations create script tags and append them to the <head>. Please follow the following format as a guide:
             */
-            common.forwardWebRequestsServerSide = forwarderSettings.forwardWebRequestsServerSide === 'True'
-            if (!forwarderSettings.forwardWebRequestsServerSide || forwarderSettings.forwardWebRequestsServerSide === "False") {
+            var forwardWebRequestsServerSide = forwarderSettings.forwardWebRequestsServerSide === 'True';
+            common.forwardWebRequestsServerSide = forwardWebRequestsServerSide;
+            if (!forwardWebRequestsServerSide) {
                 if (!window.heap) {
                     window.heap = window.heap || [];
                     heap.load = function (e, t) {
