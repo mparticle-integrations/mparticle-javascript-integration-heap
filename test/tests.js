@@ -1,19 +1,17 @@
-const { userIdentificationType } = require("./end-to-end-testapp/settings");
-
 /* eslint-disable no-undef*/
 describe('Heap Forwarder', function () {
     // -------------------DO NOT EDIT ANYTHING BELOW THIS LINE-----------------------
     var MessageType = {
-        SessionStart: 1,
-        SessionEnd: 2,
-        PageView: 3,
-        PageEvent: 4,
-        CrashReport: 5,
-        OptOut: 6,
-        AppStateTransition: 10,
-        Profile: 14,
-        Commerce: 16
-    },
+            SessionStart: 1,
+            SessionEnd: 2,
+            PageView: 3,
+            PageEvent: 4,
+            CrashReport: 5,
+            OptOut: 6,
+            AppStateTransition: 10,
+            Profile: 14,
+            Commerce: 16,
+        },
         EventType = {
             Unknown: 0,
             Navigation: 1,
@@ -27,7 +25,7 @@ describe('Heap Forwarder', function () {
             Media: 9,
             getName: function () {
                 return 'blahblah';
-            }
+            },
         },
         ProductActionType = {
             Unknown: 0,
@@ -40,7 +38,7 @@ describe('Heap Forwarder', function () {
             Purchase: 7,
             Refund: 8,
             AddToWishlist: 9,
-            RemoveFromWishlist: 10
+            RemoveFromWishlist: 10,
         },
         IdentityType = {
             Other: 0,
@@ -80,10 +78,9 @@ describe('Heap Forwarder', function () {
             return {
                 getMPID: function () {
                     return '123';
-                }
-
+                },
             };
-        }
+        },
     };
     // -------------------START EDITING BELOW:-----------------------
     var MockHeapForwarder = function () {
@@ -142,8 +139,7 @@ describe('Heap Forwarder', function () {
                 for (var key in userAttributes) {
                     if (userAttributes[key] === null) {
                         delete self.userAttributes[key];
-                    }
-                    else {
+                    } else {
                         self.userAttributes[key] = userAttributes[key];
                     }
                 }
@@ -155,7 +151,7 @@ describe('Heap Forwarder', function () {
         };
     };
 
-    before(function () {
+    before(function () {});
 
     });
 
@@ -163,27 +159,48 @@ describe('Heap Forwarder', function () {
         window.MockHeapForwarder = new MockHeapForwarder();
         // Include any specific settings that is required for initializing your SDK here
         var sdkSettings = {
-            appId: '17592203',
+            appId: 'test-app-id',
             userIdentificationType: 'customerid'
         };
 
         // You may require userAttributes or userIdentities to be passed into initialization
         var userAttributes = {
-            color: 'green'
+            color: 'green',
         };
-        var userIdentities = [{
-            Identity: 'customerId',
-            Type: IdentityType.CustomerId
-        }, {
-            Identity: 'email',
-            Type: IdentityType.Email
-        }, {
-            Identity: 'facebook',
-            Type: IdentityType.Facebook
-        }];
+        var userIdentities = [
+            {
+                Identity: 'customerId',
+                Type: IdentityType.CustomerId,
+            },
+            {
+                Identity: 'email',
+                Type: IdentityType.Email,
+            },
+            {
+                Identity: 'facebook',
+                Type: IdentityType.Facebook,
+            },
+        ];
 
         // The third argument here is a boolean to indicate that the integration is in test mode to avoid loading any third party scripts. Do not change this value.
-        mParticle.forwarder.init(sdkSettings, reportService.cb, true, null, userAttributes, userIdentities);
+        mParticle.forwarder.init(
+            sdkSettings,
+            reportService.cb,
+            true,
+            null,
+            userAttributes,
+            userIdentities
+        );
+    });
+
+    it('should initialize Heap', function (done) {
+        mParticle.forwarder.init({
+            appId: 'test-app-id',
+        });
+
+        window.heap.should.be.defined;
+        window.heap.appid.should.equal('test-app-id');
+        done();
     });
 
     describe('initialization', function () {
@@ -315,6 +332,7 @@ describe('Heap Forwarder', function () {
         done();
     });
 
+    it('should log a product purchase commerce event', function (done) {
     it('should log a product purchase commerce event', function (done) {
         // mParticle.forwarder.process({
         //     EventName: 'Test Purchase Event',
