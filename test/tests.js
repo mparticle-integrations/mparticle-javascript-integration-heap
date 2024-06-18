@@ -10,7 +10,7 @@ describe('XYZ Forwarder', function () {
             OptOut: 6,
             AppStateTransition: 10,
             Profile: 14,
-            Commerce: 16
+            Commerce: 16,
         },
         EventType = {
             Unknown: 0,
@@ -23,9 +23,9 @@ describe('XYZ Forwarder', function () {
             Social: 7,
             Other: 8,
             Media: 9,
-            getName: function() {
+            getName: function () {
                 return 'blahblah';
-            }
+            },
         },
         ProductActionType = {
             Unknown: 0,
@@ -38,7 +38,7 @@ describe('XYZ Forwarder', function () {
             Purchase: 7,
             Refund: 8,
             AddToWishlist: 9,
-            RemoveFromWishlist: 10
+            RemoveFromWishlist: 10,
         },
         IdentityType = {
             Other: 0,
@@ -70,21 +70,20 @@ describe('XYZ Forwarder', function () {
         },
         reportService = new ReportingService();
 
-// -------------------DO NOT EDIT ANYTHING ABOVE THIS LINE-----------------------
-// -------------------START EDITING BELOW:-----------------------
-// -------------------mParticle stubs - Add any additional stubbing to our methods as needed-----------------------
+    // -------------------DO NOT EDIT ANYTHING ABOVE THIS LINE-----------------------
+    // -------------------START EDITING BELOW:-----------------------
+    // -------------------mParticle stubs - Add any additional stubbing to our methods as needed-----------------------
     mParticle.Identity = {
-        getCurrentUser: function() {
+        getCurrentUser: function () {
             return {
-                getMPID: function() {
+                getMPID: function () {
                     return '123';
-                }
-
+                },
             };
-        }
+        },
     };
-// -------------------START EDITING BELOW:-----------------------
-    var MockXYZForwarder = function() {
+    // -------------------START EDITING BELOW:-----------------------
+    var MockXYZForwarder = function () {
         var self = this;
 
         // create properties for each type of event you want tracked, see below for examples
@@ -104,13 +103,13 @@ describe('XYZ Forwarder', function () {
         this.purchaseEventProperties = [];
 
         // stub your different methods to ensure they are being called properly
-        this.initialize = function(appId, apiKey) {
+        this.initialize = function (appId, apiKey) {
             self.initializeCalled = true;
             self.apiKey = apiKey;
             self.appId = appId;
         };
 
-        this.stubbedTrackingMethod = function(name, eventProperties){
+        this.stubbedTrackingMethod = function (name, eventProperties) {
             self.trackCustomEventCalled = true;
             self.trackCustomName = name;
             self.eventProperties.push(eventProperties);
@@ -118,58 +117,76 @@ describe('XYZ Forwarder', function () {
             return true;
         };
 
-        this.stubbedUserAttributeSettingMethod = function(userAttributes) {
+        this.stubbedUserAttributeSettingMethod = function (userAttributes) {
             self.userId = id;
             userAttributes = userAttributes || {};
             if (Object.keys(userAttributes).length) {
                 for (var key in userAttributes) {
                     if (userAttributes[key] === null) {
                         delete self.userAttributes[key];
-                    }
-                    else {
+                    } else {
                         self.userAttributes[key] = userAttributes[key];
                     }
                 }
             }
         };
 
-        this.stubbedUserLoginMethod = function(id) {
+        this.stubbedUserLoginMethod = function (id) {
             self.userId = id;
         };
     };
 
-    before(function () {
+    before(function () {});
 
-    });
-
-    beforeEach(function() {
+    beforeEach(function () {
         window.MockXYZForwarder = new MockXYZForwarder();
         // Include any specific settings that is required for initializing your SDK here
         var sdkSettings = {
             clientKey: '123456',
-            appId: 'abcde',
-            userIdField: 'customerId'
+            appId: 'test-app-id',
         };
+
         // You may require userAttributes or userIdentities to be passed into initialization
         var userAttributes = {
-            color: 'green'
+            color: 'green',
         };
-        var userIdentities = [{
-            Identity: 'customerId',
-            Type: IdentityType.CustomerId
-        }, {
-            Identity: 'email',
-            Type: IdentityType.Email
-        }, {
-            Identity: 'facebook',
-            Type: IdentityType.Facebook
-        }];
+        var userIdentities = [
+            {
+                Identity: 'customerId',
+                Type: IdentityType.CustomerId,
+            },
+            {
+                Identity: 'email',
+                Type: IdentityType.Email,
+            },
+            {
+                Identity: 'facebook',
+                Type: IdentityType.Facebook,
+            },
+        ];
 
         // The third argument here is a boolean to indicate that the integration is in test mode to avoid loading any third party scripts. Do not change this value.
-        mParticle.forwarder.init(sdkSettings, reportService.cb, true, null, userAttributes, userIdentities);
+        mParticle.forwarder.init(
+            sdkSettings,
+            reportService.cb,
+            true,
+            null,
+            userAttributes,
+            userIdentities
+        );
     });
 
-    it('should log event', function(done) {
+    it('should initialize Heap', function (done) {
+        mParticle.forwarder.init({
+            appId: 'test-app-id',
+        });
+
+        window.heap.should.be.defined;
+        window.heap.appid.should.equal('test-app-id');
+        done();
+    });
+
+    it('should log event', function (done) {
         // mParticle.forwarder.process({
         //     EventDataType: MessageType.PageEvent,
         //     EventName: 'Test Event',
@@ -179,14 +196,14 @@ describe('XYZ Forwarder', function () {
         //         category: 'category'
         //     }
         // });
-        
+
         // window.MockXYZForwarder.eventProperties[0].label.should.equal('label');
         // window.MockXYZForwarder.eventProperties[0].value.should.equal(200);
 
         done();
     });
 
-    it('should log page view', function(done) {
+    it('should log page view', function (done) {
         // mParticle.forwarder.process({
         //     EventDataType: MessageType.PageView,
         //     EventName: 'test name',
@@ -204,7 +221,7 @@ describe('XYZ Forwarder', function () {
         done();
     });
 
-    it('should log a product purchase commerce event', function(done) {
+    it('should log a product purchase commerce event', function (done) {
         // mParticle.forwarder.process({
         //     EventName: 'Test Purchase Event',
         //     EventDataType: MessageType.Commerce,
@@ -249,7 +266,7 @@ describe('XYZ Forwarder', function () {
         done();
     });
 
-    it('should set customer id user identity on user identity change', function(done) {
+    it('should set customer id user identity on user identity change', function (done) {
         // var fakeUserStub = {
         //     getUserIdentities: function() {
         //         return {
