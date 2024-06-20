@@ -16,11 +16,7 @@ A non-ecommerce event has the following schema:
 function EventHandler(common) {
     this.common = common || {};
 }
-EventHandler.prototype.logEvent = function(event) {
-    if (event.EventName != "click" && event.EventName != "change" && event.EventName != "submit") {
-        window.heap.track(event.EventName, event.EventAttributes);
-    }
-};
+EventHandler.prototype.logEvent = function(event) {};
 EventHandler.prototype.logError = function(event) {
     // The schema for a logError event is the same, but noteworthy differences are as follows:
     // {
