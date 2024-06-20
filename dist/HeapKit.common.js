@@ -95,11 +95,7 @@ A non-ecommerce event has the following schema:
 function EventHandler(common) {
     this.common = common || {};
 }
-EventHandler.prototype.logEvent = function(event) {
-    if (event.EventName != "click" && event.EventName != "change" && event.EventName != "submit") {
-        window.heap.track(event.EventName, event.EventAttributes);
-    }
-};
+EventHandler.prototype.logEvent = function(event) {};
 EventHandler.prototype.logError = function(event) {
     // The schema for a logError event is the same, but noteworthy differences are as follows:
     // {
@@ -140,30 +136,19 @@ For more userIdentity types, see https://docs.mparticle.com/developers/sdk/web/i
 function IdentityHandler(common) {
     this.common = common || {};
 }
-IdentityHandler.prototype.onUserIdentified = function(mParticleUser) {
-    var identitiesObject = mParticleUser.getUserIdentities();
-    var identity = identitiesObject.userIdentities[this.common.userIdentificationType];
-
-    if (identity) {
-        window.heap.identify(identity);
-    }
-};
+IdentityHandler.prototype.onUserIdentified = function(mParticleUser) {};
 IdentityHandler.prototype.onIdentifyComplete = function(
     mParticleUser,
     identityApiRequest
-) {
-};
+) {};
 IdentityHandler.prototype.onLoginComplete = function(
     mParticleUser,
     identityApiRequest
-) {
-};
+) {};
 IdentityHandler.prototype.onLogoutComplete = function(
     mParticleUser,
     identityApiRequest
-) {
-    window.heap.resetIdentity();
-};
+) {};
 IdentityHandler.prototype.onModifyComplete = function(
     mParticleUser,
     identityApiRequest
@@ -177,80 +162,51 @@ IdentityHandler.prototype.onSetUserIdentity = function(
     forwarderSettings,
     id,
     type
-) {
-    if (forwarderSettings.userIdentificationType == type) {
-        heap.identify(id);
-    }
-};
+) {};
 
 var identityHandler = IdentityHandler;
 
 var initialization = {
     name: 'Heap',
-    /*  ****** Fill out initForwarder to load your SDK ******
-        Note that not all arguments may apply to your SDK initialization.
-        These are passed from mParticle, but leave them even if they are not being used.
-        forwarderSettings contain settings that your SDK requires in order to initialize
-        userAttributes example: {gender: 'male', age: 25}
-        userIdentities example: { 1: 'customerId', 2: 'facebookId', 7: 'emailid@email.com' }
-        additional identityTypes can be found at https://github.com/mParticle/mparticle-sdk-javascript/blob/master-v2/src/types.js#L88-L101
-    */
-    initForwarder: function (
-        forwarderSettings,
-        testMode,
-        userAttributes,
-        userIdentities,
-        processEvent,
-        eventQueue,
-        isInitialized,
-        common,
-        appVersion,
-        appName,
-        customFlags,
-        clientId
-    ) {
+/*  ****** Fill out initForwarder to load your SDK ******
+    Note that not all arguments may apply to your SDK initialization.
+    These are passed from mParticle, but leave them even if they are not being used.
+    forwarderSettings contain settings that your SDK requires in order to initialize
+    userAttributes example: {gender: 'male', age: 25}
+    userIdentities example: { 1: 'customerId', 2: 'facebookId', 7: 'emailid@email.com' }
+    additional identityTypes can be found at https://github.com/mParticle/mparticle-sdk-javascript/blob/master-v2/src/types.js#L88-L101
+*/
+    initForwarder: function(forwarderSettings, testMode, userAttributes, userIdentities, processEvent, eventQueue, isInitialized, common, appVersion, appName, customFlags, clientId) {
         /* `forwarderSettings` contains your SDK specific settings such as apiKey that your customer needs in order to initialize your SDK properly */
         if (!testMode) {
             /* Load your Web SDK here using a variant of your snippet from your readme that your customers would generally put into their <head> tags
                Generally, our integrations create script tags and append them to the <head>. Please follow the following format as a guide:
             */
-            common.userIdentificationType = forwarderSettings.userIdentificationType;
 
-            var forwardWebRequestsServerSide = forwarderSettings.forwardWebRequestsServerSide === 'True';
-            common.forwardWebRequestsServerSide = forwardWebRequestsServerSide;
-            if (!forwardWebRequestsServerSide) {
-                if (!window.heap) {
-                    window.heap = window.heap || [];
-                    heap.load = function (e, t) {
-                        (window.heap.appid = e), (window.heap.config = t = t || {});
-                        var heapScript = document.createElement('script');
-                        heapScript.type = 'text/javascript';
-                        heapScript.async = !0;
-                        heapScript.src =
-                            'https://cdn.heapanalytics.com/js/heap-' + e + '.js';
-                        (
-                            document.getElementsByTagName('head')[0] ||
-                            document.getElementsByTagName('body')[0]
-                        ).appendChild(heapScript);
+            if (!window.heap) {
+                var heapScript = document.createElement('script');
+                heapScript.type = 'text/javascript';
+                heapScript.async = true;
+                heapScript.src = 'https://cdn.heapanalytics.com/js/heap-' + forwarderSettings.appId + '.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(heapScript);
+                heapScript.onload = function() {
 
-                        heapScript.onload = function () {
-
-                            if (window.heap && eventQueue.length > 0) {
-                                // Process any events that may have been queued up while forwarder was being initialized.
-                                for (var i = 0; i < eventQueue.length; i++) {
-                                    processEvent(eventQueue[i]);
-                                }
-                                // now that each queued event is processed, we empty the eventQueue
-                                eventQueue = [];
-                            }
-                        };
-                    };
-
-                    window.heap.load(forwarderSettings.appId);
-                }
+                    if (window.heap && eventQueue.length > 0) {
+                        // Process any events that may have been queued up while forwarder was being initialized.
+                        for (var i = 0; i < eventQueue.length; i++) {
+                            processEvent(eventQueue[i]);
+                        }
+                         // now that each queued event is processed, we empty the eventQueue
+                        eventQueue = [];
+                    }
+                   window.heap.load(forwarderSettings.appId);
+                };
             }
+
+
+
         }
-    },
+    }
 };
 
 var initialization_1 = initialization;
@@ -281,22 +237,12 @@ function UserAttributeHandler(common) {
 UserAttributeHandler.prototype.onRemoveUserAttribute = function(
     key,
     mParticleUser
-) {
-    delete this.common.userAttributes[key];
-    window.heap.addUserProperties(this.common.userAttributes);
-};
+) {};
 UserAttributeHandler.prototype.onSetUserAttribute = function(
     key,
     value,
     mParticleUser
-) {
-    if (!this.common.userAttributes) {
-        this.common.userAttributes = {};
-    }
-
-    this.common.userAttributes[key] = value;
-    window.heap.addUserProperties(this.common.userAttributes);
-};
+) {};
 UserAttributeHandler.prototype.onConsentStateUpdated = function(
     oldState,
     newState,
@@ -446,7 +392,8 @@ var constructor = function() {
 
     function logSessionStart(event) {
         try {
-            return sessionHandler_1.onSessionStart(event);
+            sessionHandler_1.onSessionStart(event);
+            return true;
         } catch (e) {
             return {
                 error: 'Error starting session on forwarder ' + name + '; ' + e,
@@ -456,7 +403,8 @@ var constructor = function() {
 
     function logSessionEnd(event) {
         try {
-            return sessionHandler_1.onSessionEnd(event);
+            sessionHandler_1.onSessionEnd(event);
+            return true;
         } catch (e) {
             return {
                 error: 'Error ending session on forwarder ' + name + '; ' + e,
@@ -466,7 +414,8 @@ var constructor = function() {
 
     function logError(event) {
         try {
-            return self.eventHandler.logError(event);
+            self.eventHandler.logError(event);
+            return true;
         } catch (e) {
             return {
                 error: 'Error logging error on forwarder ' + name + '; ' + e,
@@ -476,7 +425,8 @@ var constructor = function() {
 
     function logPageView(event) {
         try {
-            return self.eventHandler.logPageView(event);
+            self.eventHandler.logPageView(event);
+            return true;
         } catch (e) {
             return {
                 error:
@@ -487,7 +437,8 @@ var constructor = function() {
 
     function logEvent(event) {
         try {
-            return self.eventHandler.logEvent(event);
+            self.eventHandler.logEvent(event);
+            return true;
         } catch (e) {
             return {
                 error: 'Error logging event on forwarder ' + name + '; ' + e,
@@ -497,7 +448,8 @@ var constructor = function() {
 
     function logEcommerceEvent(event) {
         try {
-            return self.commerceHandler.logCommerceEvent(event);
+            self.commerceHandler.logCommerceEvent(event);
+            return true;
         } catch (e) {
             return {
                 error:
