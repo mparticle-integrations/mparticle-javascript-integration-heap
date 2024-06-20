@@ -96,7 +96,6 @@ describe('Heap Forwarder', function () {
 
         this.trackCustomName = null;
         this.logPurchaseName = null;
-        this.appid = null;
         this.identity = null;
         this.userAttributes = {};
         this.userIdField = null;
@@ -109,18 +108,20 @@ describe('Heap Forwarder', function () {
         this.initialize = function (appId, apiKey) {
             self.initializeCalled = true;
             self.apiKey = apiKey;
-            self.appId = appId;
-        };
-
-        this.load = function (appId) {
-            self.loadCalled = true;
-            self.appid = appId;
         };
 
         this.identify = function (identity) {
             self.identity = identity;
             self.identifyCalled = true;
         };
+
+        this.getIdentity = function () {
+            return self.identity;
+        }
+
+        this.resetIdentity = function () {
+            self.identity = null;
+        }
 
         this.addUserProperties = function (properties) {
             self.addUserPropertiesCalled = true;
@@ -169,6 +170,7 @@ describe('Heap Forwarder', function () {
             clientKey: '123456',
             appId: 'test-app-id',
             userIdentificationType: 'customerid',
+            forwardWebRequestsServerSide: false,
         };
 
         // You may require userAttributes or userIdentities to be passed into initialization
@@ -204,10 +206,16 @@ describe('Heap Forwarder', function () {
     it('should initialize Heap', function (done) {
         mParticle.forwarder.init({
             appId: 'test-app-id',
+            forwardWebRequestsServerSide: false,
         });
 
         window.heap.should.be.ok;
-        window.heap.appid.should.equal('test-app-id');
+        window.heap.track.should.be.ok;
+        // The Heap SDK initializes with a stubbed object that contains
+        //  `envId: <app-id>` but will be replaced by `appId: <app-id>` once
+        //  Heap fully initializes. For the purposes of our test framework,
+        // we test to make sure the stubbed methods are initialized.
+        window.heap.envId.should.equal('test-app-id');
         done();
     });
 
@@ -231,8 +239,8 @@ describe('Heap Forwarder', function () {
             };
             mParticle.forwarder.onUserIdentified(user);
 
-            window.heap.should.be.ok;
-            window.heap.identity.should.equal('cid123');
+            window.heap.getIdentity.should.be.ok;
+            window.heap.getIdentity().should.equal('cid123');
             done();
         });
 
@@ -254,11 +262,11 @@ describe('Heap Forwarder', function () {
             mParticle.forwarder.onUserIdentified(user);
 
             window.heap.should.be.ok;
-            window.heap.identity.should.equal('cid123');
+            window.heap.getIdentity().should.equal('cid123');
 
             mParticle.forwarder.onLogoutComplete();
 
-            window.heap.identity.should.not.exist;
+            expect(window.heap.getIdentity()).to.be.null
             done();
         });
     });

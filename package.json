@@ -6,7 +6,6 @@
     "dist/HeapKit.common.js"
   ],
   "scripts": {
-    "testKarma": "node test/boilerplate/test-karma.js",
     "build": "ENVIRONMENT=production rollup --config rollup.config.js",
     "build:test": "rollup --config rollup.test.config.js",
     "watch": "ENVIRONMENT=production rollup --config rollup.config.js -w",
