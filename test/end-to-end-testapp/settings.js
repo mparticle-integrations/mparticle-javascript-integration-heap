@@ -4,7 +4,7 @@ var SDKsettings = {
     initialize, this may be apiKey, projectId, primaryCustomerType, etc. These are passed
     into the src/initialization.js file as the
     */
-    appId: '1518360323',
+    appId: 'testAppId',
     userIdentificationType: 'customerid',
 };
 
