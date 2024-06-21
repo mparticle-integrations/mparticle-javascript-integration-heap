@@ -23,7 +23,7 @@ UserAttributeHandler.prototype.onSetUserAttribute = function(
     mParticleUser
 ) {
     if (!this.common.userAttributes) {
-        this.common.userAttributes = {};
+        this.common.userAttributes = mParticleUser.getAllUserAttributes();
     }
 
     this.common.userAttributes[key] = value;
