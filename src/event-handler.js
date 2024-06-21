@@ -17,7 +17,16 @@ function EventHandler(common) {
     this.common = common || {};
 }
 EventHandler.prototype.logEvent = function(event) {
-    if (event.EventName == "click" || event.EventName == "change" || event.EventName == "submit") return;
+    var ignoredEvents = [
+        'click',
+        'change',
+        'submit'
+    ];
+
+    if (ignoredEvents.includes(event.EventName.toLowerCase())) {
+        return;
+    }
+
     window.heap.track(event.EventName, event.EventAttributes);
 };
 EventHandler.prototype.logError = function(event) {
