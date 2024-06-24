@@ -122,7 +122,7 @@ describe('Heap Forwarder', function () {
             self.identifyCalled = true;
         };
 
-        this.addUserProperties = function(properties) {
+        this.addUserProperties = function (properties) {
             self.addUserPropertiesCalled = true;
             self.userAttributes = properties;
         };
@@ -217,18 +217,18 @@ describe('Heap Forwarder', function () {
 
             mParticle.forwarder.init({
                 appId: 'test-app-id',
-                userIdentificationType: 'customerid'
+                userIdentificationType: 'customerid',
             });
 
             var user = {
                 getUserIdentities: function () {
                     return {
                         userIdentities: {
-                            customerid: 'cid123'
-                        }
-                    }
-                }
-            }
+                            customerid: 'cid123',
+                        },
+                    };
+                },
+            };
             mParticle.forwarder.onUserIdentified(user);
 
             window.heap.should.be.defined;
@@ -239,18 +239,18 @@ describe('Heap Forwarder', function () {
         it('should return a null identity on logout', function (done) {
             mParticle.forwarder.init({
                 appId: 'test-app-id',
-                userIdentificationType: 'customerid'
+                userIdentificationType: 'customerid',
             });
 
             var user = {
                 getUserIdentities: function () {
                     return {
                         userIdentities: {
-                            customerid: 'cid123'
-                        }
-                    }
-                }
-            }
+                            customerid: 'cid123',
+                        },
+                    };
+                },
+            };
             mParticle.forwarder.onUserIdentified(user);
 
             window.heap.should.be.defined;
@@ -265,19 +265,19 @@ describe('Heap Forwarder', function () {
 
     describe('UserAttributeProcessing', function () {
         it('Should log all user attributes when one is added', function (done) {
-            mParticle.forwarder.setUserAttribute("newKey", "newValue");
+            mParticle.forwarder.setUserAttribute('newKey', 'newValue');
 
             window.heap.addUserPropertiesCalled.should.equal(true);
             done();
         });
 
-        it('Should log user attributes when one is removed', function(done){
-            mParticle.forwarder.setUserAttribute("newKey2", "newValue2");
+        it('Should log user attributes when one is removed', function (done) {
+            mParticle.forwarder.setUserAttribute('newKey2', 'newValue2');
 
             window.heap.userAttributes.newKey2.should.exist;
             window.heap.userAttributes.newKey.should.exist;
 
-            mParticle.forwarder.removeUserAttribute("newKey");
+            mParticle.forwarder.removeUserAttribute('newKey');
 
             Object.keys(window.heap.userAttributes).length.should.equal(1);
             window.heap.addUserPropertiesCalled.should.equal(true);
@@ -289,7 +289,7 @@ describe('Heap Forwarder', function () {
         it('should log event', function (done) {
             window.heap = new MockHeapForwarder();
             mParticle.forwarder.init({
-                appId: 'test-app-id'
+                appId: 'test-app-id',
             });
 
             mParticle.forwarder.process({
@@ -298,8 +298,8 @@ describe('Heap Forwarder', function () {
                 EventAttributes: {
                     label: 'label',
                     value: 200,
-                    category: 'category'
-                }
+                    category: 'category',
+                },
             });
 
             window.heap.trackCalled.should.equal(true);
