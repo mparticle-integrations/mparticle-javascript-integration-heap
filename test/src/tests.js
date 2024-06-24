@@ -206,7 +206,7 @@ describe('Heap Forwarder', function () {
             appId: 'test-app-id',
         });
 
-        window.heap.should.be.defined;
+        window.heap.should.be.ok;
         window.heap.appid.should.equal('test-app-id');
         done();
     });
@@ -231,7 +231,7 @@ describe('Heap Forwarder', function () {
             };
             mParticle.forwarder.onUserIdentified(user);
 
-            window.heap.should.be.defined;
+            window.heap.should.be.ok;
             window.heap.identity.should.equal('cid123');
             done();
         });
@@ -253,7 +253,7 @@ describe('Heap Forwarder', function () {
             };
             mParticle.forwarder.onUserIdentified(user);
 
-            window.heap.should.be.defined;
+            window.heap.should.be.ok;
             window.heap.identity.should.equal('cid123');
 
             mParticle.forwarder.onLogoutComplete();
@@ -264,14 +264,14 @@ describe('Heap Forwarder', function () {
     });
 
     describe('UserAttributeProcessing', function () {
-        it('Should log all user attributes when one is added', function (done) {
+        it('should log all user attributes when one is added', function (done) {
             mParticle.forwarder.setUserAttribute('newKey', 'newValue');
 
             window.heap.addUserPropertiesCalled.should.equal(true);
             done();
         });
 
-        it('Should log user attributes when one is removed', function (done) {
+        it('should log user attributes when one is removed', function (done) {
             mParticle.forwarder.setUserAttribute('newKey2', 'newValue2');
 
             window.heap.userAttributes.newKey2.should.exist;
