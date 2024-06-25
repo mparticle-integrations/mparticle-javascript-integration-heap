@@ -39,6 +39,7 @@ describe('Heap Forwarder', function () {
             Refund: 8,
             AddToWishlist: 9,
             RemoveFromWishlist: 10,
+            Impression: 22,
         },
         IdentityType = {
             Other: 0,
@@ -293,7 +294,7 @@ describe('Heap Forwarder', function () {
         });
     });
 
-    describe('EventProcessing', function () {
+    describe('CustomEventProcessing', function () {
         it('should log event', function (done) {
             window.heap = new MockHeapForwarder();
             mParticle.forwarder.init({
@@ -316,6 +317,209 @@ describe('Heap Forwarder', function () {
             window.heap.eventProperties[0].label.should.equal('label');
             window.heap.eventProperties[0].value.should.equal(200);
             window.heap.eventProperties[0].category.should.equal('category');
+            done();
+        });
+    });
+
+    describe('CommerceEventProcessing', function () {
+        const product1 = {
+                Name: 'iphone',
+                Sku: 'iphoneSKU',
+                Price: 999,
+                Quantity: 1,
+                Brand: 'brand',
+                Variant: 'variant',
+                Category: 'category',
+                Position: 1,
+                CouponCode: 'coupon',
+                TotalAmount: 999,
+                Attributes: {
+                    prod1AttrKey1: 'value1',
+                    prod1AttrKey2: 'value2',
+                },
+        };
+
+        const product2 = {
+            Name: 'galaxy',
+            Sku: 'galaxySKU',
+            Price: 799,
+            Quantity: 1,
+            Brand: 'brand',
+            Variant: 'variant',
+            Category: 'category',
+            Position: 1,
+            CouponCode: 'coupon',
+            TotalAmount: 799,
+            Attributes: {
+                prod2AttrKey1: 'value1',
+                prod2AttrKey2: 'value2',
+            },
+        };
+
+        const purchaseEvent =  {
+            EventName: 'Test Purchase Event',
+            EventDataType: MessageType.Commerce,
+            EventCategory: EventType.ProductPurchase,
+            ProductAction: {
+                ProductActionType: ProductActionType.Purchase,
+                ProductList: [
+                    product1,
+                    product1,
+                ],
+                TransactionId: 123,
+                Affiliation: 'my-affiliation',
+                TotalAmount: 450,
+                TaxAmount: 40,
+                ShippingAmount: 10,
+                CouponCode: null
+            }
+        };
+
+        const impressionEvent =  {
+            EventName: 'eCommerce - Impression',
+            EventDataType: 16,
+            EventCategory: 22,
+            ProductImpressions: [
+                {
+                    ProductImpressionList: 'Suggested Products List1',
+                    ProductList: [
+                        product1,
+                        product2,
+                    ],
+                },
+                {
+                    ProductImpressionList: 'Suggested Products List2',
+                    ProductList: [
+                        product1,
+                        product2,
+                    ],
+                },
+            ],
+        };
+
+        const promotionEvent = {
+            EventName: 'eCommerce - PromotionClick',
+            EventDataType: 16,
+            CurrencyCode: null,
+            EventCategory: 19,
+            PromotionAction: {
+                PromotionActionType: 2,
+                PromotionList: [
+                    {
+                        Id: 'my_promo_1',
+                        Creative: 'sale_banner_1',
+                        Position: 'top'
+                    },
+                    {
+                        Id: 'my_promo_2',
+                        Creative: 'sale_banner_2',
+                        Position: 'bottom',
+                    },
+                ],
+            },
+        };
+        var validateProductProperties = function (properties) {
+            if (properties.product_name === 'iphone') {
+                properties.prod1AttrKey1.should.equal('value1');
+                properties.prod1AttrKey2.should.equal('value2');
+                properties.product_brand.should.equal('brand');
+                properties.product_category.should.equal('category');
+                properties.product_id.should.equal('iphoneSKU');
+                properties.product_price.should.equal(999);
+                properties.product_quantity.should.equal(1);
+            } else {
+                properties.prod2AttrKey1.should.equal('value1');
+                properties.prod2AttrKey2.should.equal('value2');
+                properties.product_brand.should.equal('brand');
+                properties.product_category.should.equal('category');
+                properties.product_id.should.equal('galaxySKU');
+                properties.product_price.should.equal(799);
+                properties.product_quantity.should.equal(1);
+            }
+
+        };
+
+        it('should process a product purchase commerce event', function (done) {
+            window.heap = new MockHeapForwarder();
+
+            mParticle.forwarder.init({
+                appId: 'test-app-id',
+                userIdentificationType: 'customerid',
+            });
+
+            mParticle.forwarder.process(purchaseEvent);
+
+            window.heap.trackCalled.should.equal(true);
+            window.heap.events.length.should.equal(3);
+
+            for (let i = 0; i < window.heap.events.length; i++) {
+                let eventName = window.heap.events[i];
+                let properties = window.heap.eventProperties[i];
+
+                if (eventName === 'Item') {
+                    validateProductProperties(properties);
+                }
+
+                if (eventName.includes('Action')) {
+                    properties.skus.length.should.equal(2);
+                }
+            }
+
+            done();
+        });
+
+        it('should process a product impression event', function (done) {
+            window.heap = new MockHeapForwarder();
+
+            mParticle.forwarder.init({
+                appId: 'test-app-id',
+                userIdentificationType: 'customerid',
+            });
+
+            mParticle.forwarder.process(impressionEvent);
+
+            window.heap.trackCalled.should.equal(true);
+            window.heap.events.length.should.equal(6);
+
+            for (let i = 0; i < window.heap.events.length; i++) {
+                let eventName = window.heap.events[i];
+                let properties = window.heap.eventProperties[i];
+
+                if (eventName === 'Item') {
+                    validateProductProperties(properties);
+                }
+
+                if (eventName.includes('Action')) {
+                    properties.skus.length.should.equal(2);
+                }
+            }
+            done();
+        });
+
+        it('should process a promotion event', function (done) {
+            window.heap = new MockHeapForwarder();
+
+            mParticle.forwarder.init({
+                appId: 'test-app-id',
+                userIdentificationType: 'customerid',
+            });
+
+            mParticle.forwarder.process(promotionEvent);
+
+            for (let i = 0; i < window.heap.events.length; i++) {
+                let eventName = window.heap.events[i];
+                let properties = window.heap.eventProperties[i];
+
+                if (eventName === 'Item') {
+                    properties.creative.should.be.ok;
+                    properties.id.should.be.ok;
+                    properties.position.should.be.ok;
+                }
+
+                if (eventName.includes('Promotion')) {
+                    properties.skus.length.should.equal(2);
+                }
+            }
             done();
         });
     });
