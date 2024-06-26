@@ -22,7 +22,7 @@ jobs:
               run: npm run build
 
             - name: Run Core tests
-              run: npm run testKarma
+              run: npm run test
 
             - name: Archive npm failure logs
               uses: actions/upload-artifact@v4
