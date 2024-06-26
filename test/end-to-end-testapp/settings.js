@@ -6,6 +6,7 @@ var SDKsettings = {
     */
     appId: 'testAppId',
     userIdentificationType: 'customerid',
+    forwardWebRequestsServerSide: false,
 };
 
 // Do not edit below:
