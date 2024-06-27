@@ -425,7 +425,7 @@ describe('Heap Forwarder', function () {
 
             window.heap.trackCalled.should.equal(true);
 
-            // An mParticle product action events map to n+1
+            // An mParticle Product Action Events map to n+1
             // events in Heap based on the number of associated
             // products.
             window.heap.events.length.should.equal(3);
@@ -458,8 +458,8 @@ describe('Heap Forwarder', function () {
 
             window.heap.trackCalled.should.equal(true);
 
-            // Each mParticle impression event will map
-            // to n+1 events in heap for each impression
+            // Each mParticle Impression Event will map
+            // to n+1 events in Heap for each impression
             // based on the number of associated products.
             window.heap.events.length.should.equal(6);
 
