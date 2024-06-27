@@ -116,7 +116,7 @@ CommerceHandler.prototype.logCommerceEvent = function(event) {
             21: ProductRemoveFromWishlist,
             22: ProductImpression
         */
-    let events = [];
+    var events = [];
 
     switch (event.EventCategory) {
         case ProductActionTypes.Impression:
@@ -130,29 +130,32 @@ CommerceHandler.prototype.logCommerceEvent = function(event) {
             events = buildProductActionEvents(event);
     };
 
-    events.forEach((event) => {
+    for (var i = 0; i < events.length; i++) {
+        var event = events[i];
         window.heap.track(event.Name, event.Properties);
-    });
+    }
 };
 
 function buildImpressionEvents(event) {
-    let events = [];
+    var events = [];
 
     if (event.ProductImpressions.length > 0) {
-        event.ProductImpressions.forEach((impression) => {
-            let productSkus = [];
+        for (var i = 0; i < event.ProductImpressions.length; i++) {
+            var impression = event.ProductImpressions[i];
+            var productSkus = [];
             if (impression.ProductList.length > 0) {
-                impression.ProductList.forEach((product) => {
-                    let [productEvent, productSku] = buildProductEvent(product);
-                    events.push(productEvent);
-                    if(productSku) {
-                        productSkus.push(productSku);
+                for(var j = 0; j < impression.ProductList.length; j++) {
+                    var product = impression.ProductList[j];
+                    var eventObject = buildItemEvent(product);
+                    events.push(eventObject.event);
+                    if(eventObject.sku) {
+                        productSkus.push(eventObject.sku);
                     }
-                })
+                }
             }
 
             events.push(buildActionEvent(event, HeapConstants.EventNameImpression, productSkus))
-        })
+        }
     }
 
 
@@ -160,88 +163,90 @@ function buildImpressionEvents(event) {
 };
 
 function buildPromotionEvents(event) {
-    let events = [];
-    let promotionIds = [];
+    var events = [];
+    var promotionIds = [];
     if (event.PromotionAction.PromotionList.length > 0) {
-        event.PromotionAction.PromotionList.forEach((promotion) => {
-            let [promotionEvent, promotionId] = buildPromotionEvent(promotion);
-            events.push(promotionEvent);
+        for (var i = 0; i < event.PromotionAction.PromotionList.length; i++) {
+            var promotion = event.PromotionAction.PromotionList[i];
+            var eventObject = buildPromotionItemEvent(promotion);
+            events.push(eventObject.event);
 
-            if(promotionId) {
-                promotionIds.push(promotionId);
+            if(eventObject.id) {
+                promotionIds.push(eventObject.id);
             }
-        })
+        }
     }
-    let promotionActionEventName = HeapConstants.EventNamePromotionPart + PromotionTypeNames[event.EventCategory];
+    var promotionActionEventName = HeapConstants.EventNamePromotionPart + PromotionTypeNames[event.EventCategory];
     events.push(buildActionEvent(event, promotionActionEventName, promotionIds));
     return events;
 }
 
 function buildProductActionEvents(event) {
-    let events = [];
-    let productSkus = [];
+    var events = [];
+    var productSkus = [];
 
     if (event.ProductAction.ProductList.length > 0) {
-        event.ProductAction.ProductList.forEach((product) => {
-            let [productEvent, productSku] = buildProductEvent(product);
+        for (var i = 0; i < event.ProductAction.ProductList.length; i++) {
+            var product = event.ProductAction.ProductList[i];
+            var eventObj = buildItemEvent(product);
 
-            events.push(productEvent);
+            events.push(eventObj.event);
 
-            if (productSku) {
-                productSkus.push(productSku);
+            if (eventObj.sku) {
+                productSkus.push(eventObj.sku);
             }
-        });
+        }
     }
-    let actionEventName = event.ProductAction == null ? HeapConstants.EventNameProductAction : HeapConstants.EventNameProductActionPart + ProductActionNames[event.ProductAction.ProductActionType]
+    var actionEventName = event.ProductAction == null ? HeapConstants.EventNameProductAction : HeapConstants.EventNameProductActionPart + ProductActionNames[event.ProductAction.ProductActionType]
     events.push(buildActionEvent(event, actionEventName, productSkus));
 
     return events;
 }
 
 function buildActionEvent(event, eventName, productSkus) {
-    let properties = event.EventAttributes == null ? {} : event.EventAttributes;
+    var properties = event.EventAttributes == null ? {} : event.EventAttributes;
     properties[HeapConstants.KeyProductSkus] = productSkus;
     return {Name: eventName, Properties: properties};
 }
 
-function buildProductEvent(product) {
-    let event = {};
-    let properties = product.Attributes;
+function buildItemEvent(product) {
+    var event = {};
+    var properties = product.Attributes;
     if (!properties) {
         properties = {};
     }
 
-    let validatedName = validateHeapPropertyValue(product.Name);
+    var validatedName = validateHeapPropertyValue(product.Name);
     if (validatedName) {
         properties[HeapConstants.KeyProductName] = validatedName;
     }
 
-    let validatedPrice = validateHeapPropertyValue(product.Price);
+    var validatedPrice = validateHeapPropertyValue(product.Price);
     if (validatedPrice) {
         properties[HeapConstants.KeyProductPrice] = validatedPrice;
     }
 
-    let validatedQuantity = validateHeapPropertyValue(product.Quantity);
+    var validatedQuantity = validateHeapPropertyValue(product.Quantity);
     if (validatedQuantity) {
         properties[HeapConstants.KeyProductQuantity] = validatedQuantity;
     }
 
-    let validatedTotalProductAmount = validateHeapPropertyValue(product.TotalProductAmount);
+    var validatedTotalProductAmount = validateHeapPropertyValue(product.TotalProductAmount);
     if (validatedTotalProductAmount) {
         properties[HeapConstants.KeyProductTotalProductAmount] = validatedTotalProductAmount;
     }
 
-    let validatedSku = validateHeapPropertyValue(product.Sku);
+    var validatedSku = validateHeapPropertyValue(product.Sku);
     if (validatedSku) {
         properties[HeapConstants.KeyProductSku] = validatedSku;
     }
 
-    let validatedBrand = validateHeapPropertyValue(product.Brand);
+    var validatedBrand = validateHeapPropertyValue(product.Brand);
     if (validatedBrand) {
         properties[HeapConstants.KeyProductBrand] = validatedBrand;
     }
 
-    let validatedCategory = validateHeapPropertyValue(product.Category);
+    var validatedCategory = validateHeapPropertyValue(product.Category);
     if (validatedCategory) {
         properties[HeapConstants.KeyProductCategory] = validatedCategory;
     }
@@ -249,35 +254,36 @@ function buildProductEvent(product) {
     event.Name = HeapConstants.EventNameItem;
     event.Properties = properties;
 
-    let productSku = validatedSku;
-    return [event, productSku];
+    var productSku = validatedSku;
+    return {event: event, sku: productSku};
 }
 
-function buildPromotionEvent(promotion) {
-    let event = {};
-    let properties = promotion.Attributes ? promotion.Attributes : {};
+function buildPromotionItemEvent(promotion) {
+    var event = {};
+    var properties = promotion.Attributes ? promotion.Attributes : {};
 
-    let validatedPromotionValues = {
+    var validatedPromotionValues = {
         KeyPromotionCreative: validateHeapPropertyValue(promotion.Creative),
         KeyPromotionId: validateHeapPropertyValue(promotion.Id),
         KeyPromotionPosition: validateHeapPropertyValue(promotion.Position),
     }
 
-    Object.keys(validatedPromotionValues).forEach((key) => {
-        let value = validatedPromotionValues[key];
+    for (var i = 0; i < Object.keys(validatedPromotionValues).length; i++) {
+        var key = Object.keys(validatedPromotionValues)[i];
+        var value = validatedPromotionValues[key];
 
         if (value === undefined || key === undefined) {
             return;
         }
 
-        let constKey = HeapConstants[key];
+        var constKey = HeapConstants[key];
         properties[constKey] = value;
-    })
+    }
     event.Name = HeapConstants.EventNameItem;
     event.Properties = properties;
-    let promotionId = validatedPromotionValues.KeyPromotionId;
+    var promotionId = validatedPromotionValues.KeyPromotionId;
 
-    return [event, promotionId];
+    return {event: event, id: promotionId};
 }
 
 function validateHeapPropertyValue(value){

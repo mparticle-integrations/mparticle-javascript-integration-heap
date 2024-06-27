@@ -322,7 +322,7 @@ describe('Heap Forwarder', function () {
     });
 
     describe('CommerceEventProcessing', function () {
-        const product1 = {
+        var product1 = {
                 Name: 'iphone',
                 Sku: 'iphoneSKU',
                 Price: 999,
@@ -339,7 +339,7 @@ describe('Heap Forwarder', function () {
                 },
         };
 
-        const product2 = {
+        var product2 = {
             Name: 'galaxy',
             Sku: 'galaxySKU',
             Price: 799,
@@ -356,7 +356,7 @@ describe('Heap Forwarder', function () {
             },
         };
 
-        const purchaseEvent =  {
+        var purchaseEvent =  {
             EventName: 'Test Purchase Event',
             EventDataType: MessageType.Commerce,
             EventCategory: EventType.ProductPurchase,
@@ -375,7 +375,7 @@ describe('Heap Forwarder', function () {
             }
         };
 
-        const impressionEvent =  {
+        var impressionEvent =  {
             EventName: 'eCommerce - Impression',
             EventDataType: 16,
             EventCategory: 22,
@@ -397,7 +397,7 @@ describe('Heap Forwarder', function () {
             ],
         };
 
-        const promotionEvent = {
+        var promotionEvent = {
             EventName: 'eCommerce - PromotionClick',
             EventDataType: 16,
             CurrencyCode: null,
@@ -418,6 +418,7 @@ describe('Heap Forwarder', function () {
                 ],
             },
         };
+
         var validateProductProperties = function (properties) {
             if (properties.product_name === 'iphone') {
                 properties.prod1AttrKey1.should.equal('value1');
@@ -452,9 +453,9 @@ describe('Heap Forwarder', function () {
             window.heap.trackCalled.should.equal(true);
             window.heap.events.length.should.equal(3);
 
-            for (let i = 0; i < window.heap.events.length; i++) {
-                let eventName = window.heap.events[i];
-                let properties = window.heap.eventProperties[i];
+            for (var i = 0; i < window.heap.events.length; i++) {
+                var eventName = window.heap.events[i];
+                var properties = window.heap.eventProperties[i];
 
                 if (eventName === 'Item') {
                     validateProductProperties(properties);
@@ -481,9 +482,9 @@ describe('Heap Forwarder', function () {
             window.heap.trackCalled.should.equal(true);
             window.heap.events.length.should.equal(6);
 
-            for (let i = 0; i < window.heap.events.length; i++) {
-                let eventName = window.heap.events[i];
-                let properties = window.heap.eventProperties[i];
+            for (var i = 0; i < window.heap.events.length; i++) {
+                var eventName = window.heap.events[i];
+                var properties = window.heap.eventProperties[i];
 
                 if (eventName === 'Item') {
                     validateProductProperties(properties);
@@ -506,9 +507,9 @@ describe('Heap Forwarder', function () {
 
             mParticle.forwarder.process(promotionEvent);
 
-            for (let i = 0; i < window.heap.events.length; i++) {
-                let eventName = window.heap.events[i];
-                let properties = window.heap.eventProperties[i];
+            for (var i = 0; i < window.heap.events.length; i++) {
+                var eventName = window.heap.events[i];
+                var properties = window.heap.eventProperties[i];
 
                 if (eventName === 'Item') {
                     properties.creative.should.be.ok;
