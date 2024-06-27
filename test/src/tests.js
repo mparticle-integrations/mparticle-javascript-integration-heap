@@ -39,6 +39,7 @@ describe('Heap Forwarder', function () {
             Refund: 8,
             AddToWishlist: 9,
             RemoveFromWishlist: 10,
+            Impression: 22,
         },
         IdentityType = {
             Other: 0,
@@ -293,7 +294,7 @@ describe('Heap Forwarder', function () {
         });
     });
 
-    describe('EventProcessing', function () {
+    describe('CustomEventProcessing', function () {
         it('should log event', function (done) {
             window.heap = new MockHeapForwarder();
             mParticle.forwarder.init({
@@ -316,6 +317,191 @@ describe('Heap Forwarder', function () {
             window.heap.eventProperties[0].label.should.equal('label');
             window.heap.eventProperties[0].value.should.equal(200);
             window.heap.eventProperties[0].category.should.equal('category');
+            done();
+        });
+    });
+
+    describe('CommerceEventProcessing', function () {
+        var product = {
+            Name: 'galaxy',
+            Sku: 'galaxySKU',
+            Price: 799,
+            Quantity: 1,
+            Brand: 'brand',
+            Variant: 'variant',
+            Category: 'category',
+            Position: 1,
+            CouponCode: 'coupon',
+            TotalAmount: 799,
+            Attributes: {
+                prod2AttrKey1: 'value1',
+                prod2AttrKey2: 'value2',
+            },
+        };
+
+        var purchaseEvent =  {
+            EventName: 'Test Purchase Event',
+            EventDataType: MessageType.Commerce,
+            EventCategory: EventType.ProductPurchase,
+            ProductAction: {
+                ProductActionType: ProductActionType.Purchase,
+                ProductList: [
+                    product,
+                    product,
+                ],
+                TransactionId: 123,
+                Affiliation: 'my-affiliation',
+                TotalAmount: 450,
+                TaxAmount: 40,
+                ShippingAmount: 10,
+                CouponCode: null
+            }
+        };
+
+        var impressionEvent =  {
+            EventName: 'eCommerce - Impression',
+            EventDataType: 16,
+            EventCategory: 22,
+            ProductImpressions: [
+                {
+                    ProductImpressionList: 'Suggested Products List1',
+                    ProductList: [
+                        product,
+                        product,
+                    ],
+                },
+                {
+                    ProductImpressionList: 'Suggested Products List2',
+                    ProductList: [
+                        product,
+                        product,
+                    ],
+                },
+            ],
+        };
+
+        var promotionEvent = {
+            EventName: 'eCommerce - PromotionClick',
+            EventDataType: 16,
+            CurrencyCode: null,
+            EventCategory: 19,
+            PromotionAction: {
+                PromotionActionType: 2,
+                PromotionList: [
+                    {
+                        Id: 'my_promo_1',
+                        Creative: 'sale_banner_1',
+                        Position: 'top'
+                    },
+                    {
+                        Id: 'my_promo_2',
+                        Creative: 'sale_banner_2',
+                        Position: 'bottom',
+                    },
+                ],
+            },
+        };
+
+        var validatedProductProperties = {
+            prod2AttrKey1: 'value1',
+            prod2AttrKey2: 'value2',
+            product_name: 'galaxy',
+            product_brand: 'brand',
+            product_category: 'category',
+            product_id: 'galaxySKU',
+            product_price: 799,
+            product_quantity: 1,
+        };
+
+        it('should process a product purchase commerce event', function (done) {
+            window.heap = new MockHeapForwarder();
+
+            mParticle.forwarder.init({
+                appId: 'test-app-id',
+                userIdentificationType: 'customerid',
+            });
+
+            mParticle.forwarder.process(purchaseEvent);
+
+            window.heap.trackCalled.should.equal(true);
+
+            // An mParticle Product Action Events map to n+1
+            // events in Heap based on the number of associated
+            // products.
+            window.heap.events.length.should.equal(3);
+
+            for (var i = 0; i < window.heap.events.length; i++) {
+                var eventName = window.heap.events[i];
+                var properties = window.heap.eventProperties[i];
+
+                if (eventName === 'Item') {
+                    properties.should.deep.equal(validatedProductProperties);
+                }
+
+                if (eventName.includes('Action')) {
+                    properties.skus.length.should.equal(2);
+                }
+            }
+
+            done();
+        });
+
+        it('should process a product impression event', function (done) {
+            window.heap = new MockHeapForwarder();
+
+            mParticle.forwarder.init({
+                appId: 'test-app-id',
+                userIdentificationType: 'customerid',
+            });
+
+            mParticle.forwarder.process(impressionEvent);
+
+            window.heap.trackCalled.should.equal(true);
+
+            // Each mParticle Impression Event will map
+            // to n+1 events in Heap for each impression
+            // based on the number of associated products.
+            window.heap.events.length.should.equal(6);
+
+            for (var i = 0; i < window.heap.events.length; i++) {
+                var eventName = window.heap.events[i];
+                var properties = window.heap.eventProperties[i];
+
+                if (eventName === 'Item') {
+                    properties.should.deep.equal(validatedProductProperties);
+                }
+
+                if (eventName.includes('Action')) {
+                    properties.skus.length.should.equal(2);
+                }
+            }
+            done();
+        });
+
+        it('should process a promotion event', function (done) {
+            window.heap = new MockHeapForwarder();
+
+            mParticle.forwarder.init({
+                appId: 'test-app-id',
+                userIdentificationType: 'customerid',
+            });
+
+            mParticle.forwarder.process(promotionEvent);
+
+            for (var i = 0; i < window.heap.events.length; i++) {
+                var eventName = window.heap.events[i];
+                var properties = window.heap.eventProperties[i];
+
+                if (eventName === 'Item') {
+                    properties.creative.should.be.ok;
+                    properties.id.should.be.ok;
+                    properties.position.should.be.ok;
+                }
+
+                if (eventName.includes('Promotion')) {
+                    properties.skus.length.should.equal(2);
+                }
+            }
             done();
         });
     });
