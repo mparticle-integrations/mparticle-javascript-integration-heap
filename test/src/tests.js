@@ -322,24 +322,7 @@ describe('Heap Forwarder', function () {
     });
 
     describe('CommerceEventProcessing', function () {
-        var product1 = {
-                Name: 'iphone',
-                Sku: 'iphoneSKU',
-                Price: 999,
-                Quantity: 1,
-                Brand: 'brand',
-                Variant: 'variant',
-                Category: 'category',
-                Position: 1,
-                CouponCode: 'coupon',
-                TotalAmount: 999,
-                Attributes: {
-                    prod1AttrKey1: 'value1',
-                    prod1AttrKey2: 'value2',
-                },
-        };
-
-        var product2 = {
+        var product = {
             Name: 'galaxy',
             Sku: 'galaxySKU',
             Price: 799,
@@ -363,8 +346,8 @@ describe('Heap Forwarder', function () {
             ProductAction: {
                 ProductActionType: ProductActionType.Purchase,
                 ProductList: [
-                    product1,
-                    product1,
+                    product,
+                    product,
                 ],
                 TransactionId: 123,
                 Affiliation: 'my-affiliation',
@@ -383,15 +366,15 @@ describe('Heap Forwarder', function () {
                 {
                     ProductImpressionList: 'Suggested Products List1',
                     ProductList: [
-                        product1,
-                        product2,
+                        product,
+                        product,
                     ],
                 },
                 {
                     ProductImpressionList: 'Suggested Products List2',
                     ProductList: [
-                        product1,
-                        product2,
+                        product,
+                        product,
                     ],
                 },
             ],
@@ -419,25 +402,15 @@ describe('Heap Forwarder', function () {
             },
         };
 
-        var validateProductProperties = function (properties) {
-            if (properties.product_name === 'iphone') {
-                properties.prod1AttrKey1.should.equal('value1');
-                properties.prod1AttrKey2.should.equal('value2');
-                properties.product_brand.should.equal('brand');
-                properties.product_category.should.equal('category');
-                properties.product_id.should.equal('iphoneSKU');
-                properties.product_price.should.equal(999);
-                properties.product_quantity.should.equal(1);
-            } else {
-                properties.prod2AttrKey1.should.equal('value1');
-                properties.prod2AttrKey2.should.equal('value2');
-                properties.product_brand.should.equal('brand');
-                properties.product_category.should.equal('category');
-                properties.product_id.should.equal('galaxySKU');
-                properties.product_price.should.equal(799);
-                properties.product_quantity.should.equal(1);
-            }
-
+        var validatedProductProperties = {
+            prod2AttrKey1: 'value1',
+            prod2AttrKey2: 'value2',
+            product_name: 'galaxy',
+            product_brand: 'brand',
+            product_category: 'category',
+            product_id: 'galaxySKU',
+            product_price: 799,
+            product_quantity: 1,
         };
 
         it('should process a product purchase commerce event', function (done) {
@@ -451,6 +424,10 @@ describe('Heap Forwarder', function () {
             mParticle.forwarder.process(purchaseEvent);
 
             window.heap.trackCalled.should.equal(true);
+
+            // An mParticle product action events map to n+1
+            // events in Heap based on the number of associated
+            // products.
             window.heap.events.length.should.equal(3);
 
             for (var i = 0; i < window.heap.events.length; i++) {
@@ -458,7 +435,7 @@ describe('Heap Forwarder', function () {
                 var properties = window.heap.eventProperties[i];
 
                 if (eventName === 'Item') {
-                    validateProductProperties(properties);
+                    properties.should.deep.equal(validatedProductProperties);
                 }
 
                 if (eventName.includes('Action')) {
@@ -480,6 +457,10 @@ describe('Heap Forwarder', function () {
             mParticle.forwarder.process(impressionEvent);
 
             window.heap.trackCalled.should.equal(true);
+
+            // Each mParticle impression event will map
+            // to n+1 events in heap for each impression
+            // based on the number of associated products.
             window.heap.events.length.should.equal(6);
 
             for (var i = 0; i < window.heap.events.length; i++) {
@@ -487,7 +468,7 @@ describe('Heap Forwarder', function () {
                 var properties = window.heap.eventProperties[i];
 
                 if (eventName === 'Item') {
-                    validateProductProperties(properties);
+                    properties.should.deep.equal(validatedProductProperties);
                 }
 
                 if (eventName.includes('Action')) {

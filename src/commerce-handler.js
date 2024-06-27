@@ -212,17 +212,14 @@ function buildProductActionEvents(event) {
 }
 
 function buildActionEvent(event, eventName, productSkus) {
-    var properties = event.EventAttributes == null ? {} : event.EventAttributes;
+    var properties = event && event.EventAttributes ? event.EventAttributes : {};
     properties[HeapConstants.KeyProductSkus] = productSkus;
     return {Name: eventName, Properties: properties};
 }
 
 function buildItemEvent(product) {
     var event = {};
-    var properties = product.Attributes;
-    if (!properties) {
-        properties = {};
-    }
+    var properties = product && product.Attributes ? product.Attributes : {};
 
     var validatedName = validateHeapPropertyValue(product.Name);
     if (validatedName) {
@@ -262,13 +259,12 @@ function buildItemEvent(product) {
     event.Name = HeapConstants.EventNameItem;
     event.Properties = properties;
 
-    var productSku = validatedSku;
-    return {event: event, sku: productSku};
+    return {event: event, sku: validatedSku};
 }
 
 function buildPromotionItemEvent(promotion) {
     var event = {};
-    var properties = promotion.Attributes ? promotion.Attributes : {};
+    var properties = promotion && promotion.Attributes ? promotion.Attributes : {};
 
     var validatedPromotionValues = {
         KeyPromotionCreative: validateHeapPropertyValue(promotion.Creative),
@@ -276,8 +272,9 @@ function buildPromotionItemEvent(promotion) {
         KeyPromotionPosition: validateHeapPropertyValue(promotion.Position),
     }
 
-    for (var i = 0; i < Object.keys(validatedPromotionValues).length; i++) {
-        var key = Object.keys(validatedPromotionValues)[i];
+    var validatedPromotionKeys = Object.keys(validatedPromotionValues);
+    for (var i = 0; i < validatedPromotionKeys.length; i++) {
+        var key = validatedPromotionKeys[i];
         var value = validatedPromotionValues[key];
 
         if (value === undefined || key === undefined) {
