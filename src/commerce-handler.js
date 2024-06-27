@@ -197,7 +197,15 @@ function buildProductActionEvents(event) {
             }
         }
     }
-    var actionEventName = event.ProductAction == null ? HeapConstants.EventNameProductAction : HeapConstants.EventNameProductActionPart + ProductActionNames[event.ProductAction.ProductActionType]
+
+    var actionEventName;
+    if (!event.ProductAction) {
+        actionEventName = HeapConstants.EventNameProductAction;
+    } else {
+        var productActionKey = event.ProductAction.ProductActionType;
+        actionEventName = HeapConstants.EventNameProductActionPart + productActionKey;
+    }
+
     events.push(buildActionEvent(event, actionEventName, productSkus));
 
     return events;
