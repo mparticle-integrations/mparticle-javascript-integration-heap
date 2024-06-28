@@ -21,7 +21,18 @@ For more userIdentity types, see https://docs.mparticle.com/developers/sdk/web/i
 function IdentityHandler(common) {
     this.common = common || {};
 }
-IdentityHandler.prototype.onUserIdentified = function(mParticleUser) {};
+IdentityHandler.prototype.onUserIdentified = function(mParticleUser) {
+    if (!mParticleUser && !mParticleUser.getUserIdentities()) {
+        return;
+    }
+
+    var identitiesObject = mParticleUser.getUserIdentities();
+    var identity = identitiesObject.userIdentities[this.common.userIdentificationType];
+
+    if (identity) {
+        window.heap.identify(identity);
+    }
+};
 IdentityHandler.prototype.onIdentifyComplete = function(
     mParticleUser,
     identityApiRequest
@@ -33,7 +44,9 @@ IdentityHandler.prototype.onLoginComplete = function(
 IdentityHandler.prototype.onLogoutComplete = function(
     mParticleUser,
     identityApiRequest
-) {};
+) {
+    window.heap.resetIdentity();
+};
 IdentityHandler.prototype.onModifyComplete = function(
     mParticleUser,
     identityApiRequest
@@ -47,6 +60,10 @@ IdentityHandler.prototype.onSetUserIdentity = function(
     forwarderSettings,
     id,
     type
-) {};
+) {
+    if (this.common.userIdentificationType === type) {
+        window.heap.identify(id);
+    }
+};
 
 module.exports = IdentityHandler;

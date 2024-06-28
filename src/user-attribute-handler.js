@@ -13,12 +13,22 @@ function UserAttributeHandler(common) {
 UserAttributeHandler.prototype.onRemoveUserAttribute = function(
     key,
     mParticleUser
-) {};
+) {
+    delete this.common.userAttributes[key];
+    window.heap.addUserProperties(this.common.userAttributes);
+};
 UserAttributeHandler.prototype.onSetUserAttribute = function(
     key,
     value,
     mParticleUser
-) {};
+) {
+    if (!this.common.userAttributes) {
+        this.common.userAttributes = {};
+    }
+
+    this.common.userAttributes[key] = value;
+    window.heap.addUserProperties(this.common.userAttributes);
+};
 UserAttributeHandler.prototype.onConsentStateUpdated = function(
     oldState,
     newState,

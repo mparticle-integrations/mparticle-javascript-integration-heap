@@ -5,6 +5,8 @@ var SDKsettings = {
     into the src/initialization.js file as the
     */
     appId: 'testAppId',
+    userIdentificationType: 'customerid',
+    forwardWebRequestsServerSide: false,
 };
 
 // Do not edit below:

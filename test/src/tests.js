@@ -1,5 +1,5 @@
 /* eslint-disable no-undef*/
-describe('XYZ Forwarder', function () {
+describe('Heap Forwarder', function () {
     // -------------------DO NOT EDIT ANYTHING BELOW THIS LINE-----------------------
     var MessageType = {
             SessionStart: 1,
@@ -83,22 +83,24 @@ describe('XYZ Forwarder', function () {
         },
     };
     // -------------------START EDITING BELOW:-----------------------
-    var MockXYZForwarder = function () {
+    var MockHeapForwarder = function () {
         var self = this;
 
         // create properties for each type of event you want tracked, see below for examples
-        this.trackCustomEventCalled = false;
+        this.trackCalled = false;
         this.logPurchaseEventCalled = false;
+        this.addUserPropertiesCalled = false;
+        this.loadCalled = false;
+        this.identifyCalled = false;
         this.initializeCalled = false;
 
         this.trackCustomName = null;
         this.logPurchaseName = null;
-        this.apiKey = null;
-        this.appId = null;
-        this.userId = null;
+        this.identity = null;
         this.userAttributes = {};
         this.userIdField = null;
 
+        this.events = [];
         this.eventProperties = [];
         this.purchaseEventProperties = [];
 
@@ -106,7 +108,30 @@ describe('XYZ Forwarder', function () {
         this.initialize = function (appId, apiKey) {
             self.initializeCalled = true;
             self.apiKey = apiKey;
-            self.appId = appId;
+        };
+
+        this.identify = function (identity) {
+            self.identity = identity;
+            self.identifyCalled = true;
+        };
+
+        this.getIdentity = function () {
+            return self.identity;
+        }
+
+        this.resetIdentity = function () {
+            self.identity = null;
+        }
+
+        this.addUserProperties = function (properties) {
+            self.addUserPropertiesCalled = true;
+            self.userAttributes = properties;
+        };
+
+        this.track = function (eventName, eventAttributes) {
+            this.trackCalled = true;
+            this.events.push(eventName);
+            this.eventProperties.push(eventAttributes);
         };
 
         this.stubbedTrackingMethod = function (name, eventProperties) {
@@ -139,11 +164,13 @@ describe('XYZ Forwarder', function () {
     before(function () {});
 
     beforeEach(function () {
-        window.MockXYZForwarder = new MockXYZForwarder();
+        window.MockHeapForwarder = new MockHeapForwarder();
         // Include any specific settings that is required for initializing your SDK here
         var sdkSettings = {
             clientKey: '123456',
             appId: 'test-app-id',
+            userIdentificationType: 'customerid',
+            forwardWebRequestsServerSide: false,
         };
 
         // You may require userAttributes or userIdentities to be passed into initialization
@@ -179,28 +206,118 @@ describe('XYZ Forwarder', function () {
     it('should initialize Heap', function (done) {
         mParticle.forwarder.init({
             appId: 'test-app-id',
+            forwardWebRequestsServerSide: false,
         });
 
-        window.heap.should.be.defined;
-        window.heap.appid.should.equal('test-app-id');
+        window.heap.should.be.ok;
+        window.heap.track.should.be.ok;
+        // The Heap SDK initializes with a stubbed object that contains
+        //  `envId: <app-id>` but will be replaced by `appId: <app-id>` once
+        //  Heap fully initializes. For the purposes of our test framework,
+        // we test to make sure the stubbed methods are initialized.
+        window.heap.envId.should.equal('test-app-id');
         done();
     });
 
-    it('should log event', function (done) {
-        // mParticle.forwarder.process({
-        //     EventDataType: MessageType.PageEvent,
-        //     EventName: 'Test Event',
-        //     EventAttributes: {
-        //         label: 'label',
-        //         value: 200,
-        //         category: 'category'
-        //     }
-        // });
+    describe('UserIdentification', function () {
+        it('should log the correct identity to heap based on the forwarder settings', function (done) {
+            window.heap = new MockHeapForwarder();
 
-        // window.MockXYZForwarder.eventProperties[0].label.should.equal('label');
-        // window.MockXYZForwarder.eventProperties[0].value.should.equal(200);
+            mParticle.forwarder.init({
+                appId: 'test-app-id',
+                userIdentificationType: 'customerid',
+            });
 
-        done();
+            var user = {
+                getUserIdentities: function () {
+                    return {
+                        userIdentities: {
+                            customerid: 'cid123',
+                        },
+                    };
+                },
+            };
+            mParticle.forwarder.onUserIdentified(user);
+
+            window.heap.getIdentity.should.be.ok;
+            window.heap.getIdentity().should.equal('cid123');
+            done();
+        });
+
+        it('should return a null identity on logout', function (done) {
+            mParticle.forwarder.init({
+                appId: 'test-app-id',
+                userIdentificationType: 'customerid',
+            });
+
+            var user = {
+                getUserIdentities: function () {
+                    return {
+                        userIdentities: {
+                            customerid: 'cid123',
+                        },
+                    };
+                },
+            };
+            mParticle.forwarder.onUserIdentified(user);
+
+            window.heap.should.be.ok;
+            window.heap.getIdentity().should.equal('cid123');
+
+            mParticle.forwarder.onLogoutComplete();
+
+            expect(window.heap.getIdentity()).to.be.null
+            done();
+        });
+    });
+
+    describe('UserAttributeProcessing', function () {
+        it('should log all user attributes when one is added', function (done) {
+            mParticle.forwarder.setUserAttribute('newKey', 'newValue');
+
+            window.heap.addUserPropertiesCalled.should.equal(true);
+            done();
+        });
+
+        it('should log user attributes when one is removed', function (done) {
+            mParticle.forwarder.setUserAttribute('newKey2', 'newValue2');
+
+            window.heap.userAttributes.newKey2.should.exist;
+            window.heap.userAttributes.newKey.should.exist;
+
+            mParticle.forwarder.removeUserAttribute('newKey');
+
+            Object.keys(window.heap.userAttributes).length.should.equal(1);
+            window.heap.addUserPropertiesCalled.should.equal(true);
+            done();
+        });
+    });
+
+    describe('EventProcessing', function () {
+        it('should log event', function (done) {
+            window.heap = new MockHeapForwarder();
+            mParticle.forwarder.init({
+                appId: 'test-app-id',
+            });
+
+            mParticle.forwarder.process({
+                EventDataType: MessageType.PageEvent,
+                EventName: 'Test Event',
+                EventAttributes: {
+                    label: 'label',
+                    value: 200,
+                    category: 'category',
+                },
+            });
+
+            window.heap.trackCalled.should.equal(true);
+            window.heap.events.length.should.equal(1);
+            window.heap.events[0].should.equal('Test Event');
+            window.heap.eventProperties[0].label.should.equal('label');
+            window.heap.eventProperties[0].value.should.equal(200);
+            window.heap.eventProperties[0].category.should.equal('category');
+            done();
+        });
     });
 
     it('should log page view', function (done) {
