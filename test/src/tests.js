@@ -169,7 +169,7 @@ describe('Heap Forwarder', function () {
         // Include any specific settings that is required for initializing your SDK here
         var sdkSettings = {
             clientKey: '123456',
-            appId: 'test-app-id',
+            applicationId: 'test-app-id',
             userIdentificationType: 'customerid',
             forwardWebRequestsServerSide: false,
         };
@@ -206,14 +206,14 @@ describe('Heap Forwarder', function () {
 
     it('should initialize Heap', function (done) {
         mParticle.forwarder.init({
-            appId: 'test-app-id',
+            applicationId: 'test-app-id',
             forwardWebRequestsServerSide: false,
         });
 
         window.heap.should.be.ok;
         window.heap.track.should.be.ok;
         // The Heap SDK initializes with a stubbed object that contains
-        //  `envId: <app-id>` but will be replaced by `appId: <app-id>` once
+        //  `envId: <app-id>` but will be replaced by `applicationId: <app-id>` once
         //  Heap fully initializes. For the purposes of our test framework,
         // we test to make sure the stubbed methods are initialized.
         window.heap.envId.should.equal('test-app-id');
@@ -225,7 +225,7 @@ describe('Heap Forwarder', function () {
             window.heap = new MockHeapForwarder();
 
             mParticle.forwarder.init({
-                appId: 'test-app-id',
+                applicationId: 'test-app-id',
                 userIdentificationType: 'customerid',
             });
 
@@ -247,7 +247,7 @@ describe('Heap Forwarder', function () {
 
         it('should return a null identity on logout', function (done) {
             mParticle.forwarder.init({
-                appId: 'test-app-id',
+                applicationId: 'test-app-id',
                 userIdentificationType: 'customerid',
             });
 
@@ -298,7 +298,7 @@ describe('Heap Forwarder', function () {
         it('should log event', function (done) {
             window.heap = new MockHeapForwarder();
             mParticle.forwarder.init({
-                appId: 'test-app-id',
+                applicationId: 'test-app-id',
             });
 
             mParticle.forwarder.process({
@@ -417,7 +417,7 @@ describe('Heap Forwarder', function () {
             window.heap = new MockHeapForwarder();
 
             mParticle.forwarder.init({
-                appId: 'test-app-id',
+                applicationId: 'test-app-id',
                 userIdentificationType: 'customerid',
             });
 
@@ -450,7 +450,7 @@ describe('Heap Forwarder', function () {
             window.heap = new MockHeapForwarder();
 
             mParticle.forwarder.init({
-                appId: 'test-app-id',
+                applicationId: 'test-app-id',
                 userIdentificationType: 'customerid',
             });
 
@@ -482,7 +482,7 @@ describe('Heap Forwarder', function () {
             window.heap = new MockHeapForwarder();
 
             mParticle.forwarder.init({
-                appId: 'test-app-id',
+                applicationId: 'test-app-id',
                 userIdentificationType: 'customerid',
             });
 

@@ -38,7 +38,7 @@ var initialization = {
             common.forwardWebRequestsServerSide = forwardWebRequestsServerSide;
             if (!forwardWebRequestsServerSide) {
                 if (!window.heap) {
-                    renderSnippet(forwarderSettings.appId);
+                    renderSnippet(forwarderSettings.applicationId);
                 } else {
                     isInitialized = true;
                 }
