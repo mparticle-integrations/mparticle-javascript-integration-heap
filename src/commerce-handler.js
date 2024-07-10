@@ -202,7 +202,7 @@ function buildProductActionEvents(event) {
     if (!event.ProductAction) {
         actionEventName = HeapConstants.EventNameProductAction;
     } else {
-        var productActionKey = event.ProductAction.ProductActionType;
+        var productActionKey = ProductActionNames[event.ProductAction.ProductActionType];
         actionEventName = HeapConstants.EventNameProductActionPart + productActionKey;
     }
 
@@ -277,12 +277,10 @@ function buildPromotionItemEvent(promotion) {
         var key = validatedPromotionKeys[i];
         var value = validatedPromotionValues[key];
 
-        if (value === undefined || key === undefined) {
-            return;
+        if (value && key) {
+            var constKey = HeapConstants[key];
+            properties[constKey] = value;
         }
-
-        var constKey = HeapConstants[key];
-        properties[constKey] = value;
     }
     event.Name = HeapConstants.EventNameItem;
     event.Properties = properties;
