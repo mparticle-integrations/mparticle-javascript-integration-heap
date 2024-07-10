@@ -22,6 +22,20 @@ var ProductActionTypes = {
     ViewDetail: 15,
 };
 
+var ProductActionNames = {
+    0: "Unknown",
+    1: "Add To Cart",
+    2: "Remove From Cart",
+    3: "Checkout",
+    4: "Checkout Option",
+    5: "Click",
+    6: "View Detail",
+    7: "Purchase",
+    8: "Refund",
+    9: "Add To Wishlist",
+    10: "Remove From Wishlist",
+};
+
 var PromotionType = {
     PromotionClick: 19,
     PromotionView: 18,
@@ -198,7 +212,7 @@ function buildProductActionEvents(event) {
     if (!event.ProductAction) {
         actionEventName = HeapConstants.EventNameProductAction;
     } else {
-        var productActionKey = event.ProductAction.ProductActionType;
+        var productActionKey = ProductActionNames[event.ProductAction.ProductActionType];
         actionEventName = HeapConstants.EventNameProductActionPart + productActionKey;
     }
 
@@ -273,12 +287,10 @@ function buildPromotionItemEvent(promotion) {
         var key = validatedPromotionKeys[i];
         var value = validatedPromotionValues[key];
 
-        if (value === undefined || key === undefined) {
-            return;
+        if (value && key) {
+            var constKey = HeapConstants[key];
+            properties[constKey] = value;
         }
-
-        var constKey = HeapConstants[key];
-        properties[constKey] = value;
     }
     event.Name = HeapConstants.EventNameItem;
     event.Properties = properties;
