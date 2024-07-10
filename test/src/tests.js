@@ -440,6 +440,7 @@ describe('Heap Forwarder', function () {
 
                 if (eventName.includes('Action')) {
                     properties.skus.length.should.equal(2);
+                    eventName.includes('Purchase').should.be.ok;
                 }
             }
 
@@ -500,6 +501,7 @@ describe('Heap Forwarder', function () {
 
                 if (eventName.includes('Promotion')) {
                     properties.skus.length.should.equal(2);
+                    eventName.includes('Click').should.be.ok;
                 }
             }
             done();
