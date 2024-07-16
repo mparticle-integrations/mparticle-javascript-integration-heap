@@ -39,11 +39,11 @@ EventHandler.prototype.logError = function (event) {
 // This is used by the SDK Wrapper even if it is not used in an extended kit.
 // eslint-disable-next-line no-unused-vars
 EventHandler.prototype.logPageView = function (event) {
-    /* The schema for a logPagView event is the same, but noteworthy differences are as follows:
-    {
-        EventAttributes: {hostname: "www.google.com", title: 'Test Page'},  // These are event attributes only if no additional event attributes are explicitly provided to mParticle.logPageView(...)
-    }
-    */
+    // The schema for a logPagView event is the same, but noteworthy differences are as follows:
+    // {
+    //     EventAttributes: {hostname: "www.google.com", title: 'Test Page'},  // These are event attributes only if no additional event attributes are explicitly provided to mParticle.logPageView(...)
+    // }
+    //
 };
 
 module.exports = EventHandler;
