@@ -1,11 +1,23 @@
 Heap Integration
 ===========================
 
-Heap SDK integration for mParticle.
+This repo contains client-side, Javascript integration to Heap.
+
+# Usage
+
+JS kits are automatically included with your mParticle.js file when loading mParticle via the [snippet](https://docs.mparticle.com/developers/sdk/web/getting-started/#add-the-sdk-snippet).
+
+If loading mParticle via [npm](https://docs.mparticle.com/developers/sdk/web/self-hosting/), you will have to manually include either the client side Heap kit via npm.
+
+```
+npm i @mparticle/web-heap-kit
+```
+
+Full documentation on usage can be found [here](https://docs.mparticle.com/integrations/heap/event/).
 
 # License
 
-Copyright 2019 mParticle, Inc.
+Copyright 2024 mParticle, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
