@@ -28,6 +28,16 @@ EventHandler.prototype.logEvent = function (event) {
 
 // This is used by the SDK Wrapper even if it is not used in an extended kit.
 // eslint-disable-next-line no-unused-vars
+EventHandler.prototype.logError = function (event) {
+    // The schema for a logError event is the same, but noteworthy differences are as follows:
+    // {
+    //     EventAttributes: {m: 'name of error passed into MP', s: "Error", t: 'stack trace in string form if applicable'},
+    //     EventName: "Error"
+    // }
+};
+
+// This is used by the SDK Wrapper even if it is not used in an extended kit.
+// eslint-disable-next-line no-unused-vars
 EventHandler.prototype.logPageView = function (event) {
     /* The schema for a logPagView event is the same, but noteworthy differences are as follows:
     {
