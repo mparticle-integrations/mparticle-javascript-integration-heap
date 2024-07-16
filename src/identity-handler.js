@@ -21,42 +21,31 @@ For more userIdentity types, see https://docs.mparticle.com/developers/sdk/web/i
 function IdentityHandler(common) {
     this.common = common || {};
 }
-IdentityHandler.prototype.onUserIdentified = function(mParticleUser) {
+IdentityHandler.prototype.onUserIdentified = function (mParticleUser) {
     if (!mParticleUser && !mParticleUser.getUserIdentities()) {
         return;
     }
 
     var identitiesObject = mParticleUser.getUserIdentities();
-    var identity = identitiesObject.userIdentities[this.common.userIdentificationType];
+    var identity =
+        identitiesObject.userIdentities[this.common.userIdentificationType];
 
     if (identity) {
         window.heap.identify(identity);
     }
 };
-IdentityHandler.prototype.onIdentifyComplete = function(
-    mParticleUser,
-    identityApiRequest
-) {};
-IdentityHandler.prototype.onLoginComplete = function(
-    mParticleUser,
-    identityApiRequest
-) {};
-IdentityHandler.prototype.onLogoutComplete = function(
-    mParticleUser,
-    identityApiRequest
-) {
+IdentityHandler.prototype.onIdentifyComplete = function () {};
+IdentityHandler.prototype.onLoginComplete = function () {};
+IdentityHandler.prototype.onLogoutComplete = function () {
     window.heap.resetIdentity();
 };
-IdentityHandler.prototype.onModifyComplete = function(
-    mParticleUser,
-    identityApiRequest
-) {};
+IdentityHandler.prototype.onModifyComplete = function () {};
 
 /*  In previous versions of the mParticle web SDK, setting user identities on
     kits is only reachable via the onSetUserIdentity method below. We recommend
     filling out `onSetUserIdentity` for maximum compatibility
 */
-IdentityHandler.prototype.onSetUserIdentity = function(
+IdentityHandler.prototype.onSetUserIdentity = function (
     forwarderSettings,
     id,
     type

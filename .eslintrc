@@ -16,7 +16,7 @@
         "before": true,
         "beforeEach": true,
         "after": true,
-        "Leanplum": true
+        "heap": true
     },
     "extends": ["plugin:prettier/recommended", "eslint:recommended"],
     "plugins": ["prettier"],

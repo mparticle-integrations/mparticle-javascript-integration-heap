@@ -118,11 +118,11 @@ describe('Heap Forwarder', function () {
 
         this.getIdentity = function () {
             return self.identity;
-        }
+        };
 
         this.resetIdentity = function () {
             self.identity = null;
-        }
+        };
 
         this.addUserProperties = function (properties) {
             self.addUserPropertiesCalled = true;
@@ -267,7 +267,7 @@ describe('Heap Forwarder', function () {
 
             mParticle.forwarder.onLogoutComplete();
 
-            expect(window.heap.getIdentity()).to.be.null
+            expect(window.heap.getIdentity()).to.be.null;
             done();
         });
     });
@@ -339,43 +339,34 @@ describe('Heap Forwarder', function () {
             },
         };
 
-        var purchaseEvent =  {
+        var purchaseEvent = {
             EventName: 'Test Purchase Event',
             EventDataType: MessageType.Commerce,
             EventCategory: EventType.ProductPurchase,
             ProductAction: {
                 ProductActionType: ProductActionType.Purchase,
-                ProductList: [
-                    product,
-                    product,
-                ],
+                ProductList: [product, product],
                 TransactionId: 123,
                 Affiliation: 'my-affiliation',
                 TotalAmount: 450,
                 TaxAmount: 40,
                 ShippingAmount: 10,
-                CouponCode: null
-            }
+                CouponCode: null,
+            },
         };
 
-        var impressionEvent =  {
+        var impressionEvent = {
             EventName: 'eCommerce - Impression',
             EventDataType: 16,
             EventCategory: 22,
             ProductImpressions: [
                 {
                     ProductImpressionList: 'Suggested Products List1',
-                    ProductList: [
-                        product,
-                        product,
-                    ],
+                    ProductList: [product, product],
                 },
                 {
                     ProductImpressionList: 'Suggested Products List2',
-                    ProductList: [
-                        product,
-                        product,
-                    ],
+                    ProductList: [product, product],
                 },
             ],
         };
@@ -391,7 +382,7 @@ describe('Heap Forwarder', function () {
                     {
                         Id: 'my_promo_1',
                         Creative: 'sale_banner_1',
-                        Position: 'top'
+                        Position: 'top',
                     },
                     {
                         Id: 'my_promo_2',
