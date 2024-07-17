@@ -10,18 +10,11 @@ For any additional methods, see http://docs.mparticle.com/developers/sdk/javascr
 function UserAttributeHandler(common) {
     this.common = common || {};
 }
-UserAttributeHandler.prototype.onRemoveUserAttribute = function(
-    key,
-    mParticleUser
-) {
+UserAttributeHandler.prototype.onRemoveUserAttribute = function (key) {
     delete this.common.userAttributes[key];
     window.heap.addUserProperties(this.common.userAttributes);
 };
-UserAttributeHandler.prototype.onSetUserAttribute = function(
-    key,
-    value,
-    mParticleUser
-) {
+UserAttributeHandler.prototype.onSetUserAttribute = function (key, value) {
     if (!this.common.userAttributes) {
         this.common.userAttributes = {};
     }
@@ -29,10 +22,5 @@ UserAttributeHandler.prototype.onSetUserAttribute = function(
     this.common.userAttributes[key] = value;
     window.heap.addUserProperties(this.common.userAttributes);
 };
-UserAttributeHandler.prototype.onConsentStateUpdated = function(
-    oldState,
-    newState,
-    mParticleUser
-) {};
 
 module.exports = UserAttributeHandler;

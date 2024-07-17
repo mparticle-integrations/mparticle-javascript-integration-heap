@@ -16,12 +16,8 @@ A non-ecommerce event has the following schema:
 function EventHandler(common) {
     this.common = common || {};
 }
-EventHandler.prototype.logEvent = function(event) {
-    var ignoredEvents = [
-        'click',
-        'change',
-        'submit'
-    ];
+EventHandler.prototype.logEvent = function (event) {
+    var ignoredEvents = ['click', 'change', 'submit'];
 
     if (ignoredEvents.includes(event.EventName.toLowerCase())) {
         return;
@@ -29,19 +25,25 @@ EventHandler.prototype.logEvent = function(event) {
 
     window.heap.track(event.EventName, event.EventAttributes);
 };
-EventHandler.prototype.logError = function(event) {
+
+// This is used by the SDK Wrapper even if it is not used in an extended kit.
+// eslint-disable-next-line no-unused-vars
+EventHandler.prototype.logError = function (event) {
     // The schema for a logError event is the same, but noteworthy differences are as follows:
     // {
     //     EventAttributes: {m: 'name of error passed into MP', s: "Error", t: 'stack trace in string form if applicable'},
     //     EventName: "Error"
     // }
 };
-EventHandler.prototype.logPageView = function(event) {
-    /* The schema for a logPagView event is the same, but noteworthy differences are as follows:
-        {
-            EventAttributes: {hostname: "www.google.com", title: 'Test Page'},  // These are event attributes only if no additional event attributes are explicitly provided to mParticle.logPageView(...)
-        }
-        */
+
+// This is used by the SDK Wrapper even if it is not used in an extended kit.
+// eslint-disable-next-line no-unused-vars
+EventHandler.prototype.logPageView = function (event) {
+    // The schema for a logPagView event is the same, but noteworthy differences are as follows:
+    // {
+    //     EventAttributes: {hostname: "www.google.com", title: 'Test Page'},  // These are event attributes only if no additional event attributes are explicitly provided to mParticle.logPageView(...)
+    // }
+    //
 };
 
 module.exports = EventHandler;
