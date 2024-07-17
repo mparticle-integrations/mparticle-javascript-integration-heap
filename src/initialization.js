@@ -23,6 +23,12 @@ var initialization = {
         eventQueue,
         isInitialized,
         common
+
+        // The following are all optional parameters that may not be used by your forwarder.
+        // appVersion,
+        // appName,
+        // customFlags,
+        // clientId
     ) {
         /* `forwarderSettings` contains your SDK specific settings such as apiKey that your customer needs in order to initialize your SDK properly */
         if (!testMode) {
