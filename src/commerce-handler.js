@@ -119,15 +119,15 @@ CommerceHandler.prototype.logCommerceEvent = function (event) {
     var events = [];
 
     switch (event.EventCategory) {
-        case ProductActionTypes.Impression:
-            events = buildImpressionEvents(event);
-            break;
-        case PromotionType.PromotionClick:
-        case PromotionType.PromotionView:
-            events = buildPromotionEvents(event);
-            break;
-        default:
-            events = buildProductActionEvents(event);
+    case ProductActionTypes.Impression:
+        events = buildImpressionEvents(event);
+        break;
+    case PromotionType.PromotionClick:
+    case PromotionType.PromotionView:
+        events = buildPromotionEvents(event);
+        break;
+    default:
+        events = buildProductActionEvents(event);
     }
 
     for (var i = 0; i < events.length; i++) {
