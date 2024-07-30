@@ -1,6 +1,6 @@
 module.exports = {
     globals: {
-        heap: true
+        heap: true,
     },
     extends: ['@mparticle/sdks'] 
 }
